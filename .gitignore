@@ -41,9 +41,6 @@ dist/
 # dotenv
 frontend/.env
 
-# Lockfiles (opcional si usas solo uno)
-package-lock.json
-yarn.lock
 
 # OS-specific
 Thumbs.db
