@@ -1,12 +1,9 @@
 <a name="readme-top"></a>
 
 <div align="center">
-  
   <img src="./src/assets/images/LOGOv2.png" alt="logo" width="250" height="250" />
   <br/>
-
   <h3><b>IDRIVE - Sistema de Gestión de Usuarios</b></h3>
-
 </div>
 
 ---
@@ -51,8 +48,12 @@
 **Frontend**
 - React.js
 - Bootstrap
-- Fetch API
+- React Bootstrap
+- Axios
+- React Router DOM
 - React Toastify
+- FontAwesome
+- FullCalendar
 
 ---
 
@@ -62,6 +63,7 @@
 - 🔒 Encriptación de contraseñas con Bcrypt
 - 🔎 Búsqueda en tiempo real
 - 🧠 Validación de datos y manejo de errores
+- 📅 Calendario interactivo con FullCalendar
 - 🌐 Comunicación API REST entre frontend y backend
 
 <p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
@@ -104,6 +106,16 @@ uvicorn main:app --reload
 ```bash
 cd frontend
 npm install
+```
+
+Instalará automáticamente las siguientes dependencias clave:
+
+- `react`, `react-router-dom`, `react-scripts`
+- `axios`, `bootstrap`, `react-bootstrap`
+- `react-toastify`, `react-icons`, `@fortawesome/fontawesome-free`
+- `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`
+
+```bash
 npm start
 ```
 
