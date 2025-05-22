@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <div align="center">
-  <img src="./front_idrive/src/assets/Logo_iDrive.jpg" alt="logo" width="250" height="250" />
+  <img src="front_idrive/src/assets/Logo_iDrive.jpg" alt="logo" width="250" height="250" />
   <br/>
   <h3><b>IDRIVE - Sistema de Gestión de Usuarios</b></h3>
 </div>
@@ -32,7 +32,7 @@
 
 # 📖 Acerca del Proyecto <a name="acerca-del-proyecto"></a>
 
-**IDRIVE** es una aplicación web diseñada para gestionar y programar clases a estudiantes de manera eficiente. Desarrollada con **FastAPI** en el backend y **React** en el frontend, permite la creación, edición, eliminación y búsqueda de usuarios con validación de datos, control de roles y cifrado de contraseñas.
+**IDRIVE** es una aplicación web diseñada para gestionar usuarios de manera eficiente. Desarrollada con **FastAPI** en el backend y **React** en el frontend, permite la creación, edición, eliminación y búsqueda de usuarios con validación de datos, control de roles y cifrado de contraseñas.
 
 ---
 
