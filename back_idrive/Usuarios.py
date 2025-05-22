@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from Clever_MySQL_conn import cleverCursor, mysqlConn
+import mysql.connector
 import bcrypt
 
 usuariosRtr = APIRouter()
@@ -158,5 +159,7 @@ def validar_login(data: LoginRequest):
         else:
             raise HTTPException(status_code=404, detail="Correo o contraseña incorrectos")
 
-    except mysqlConn.Error as err:
+    except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=f"Error en el servidor: {err}")
+
+
