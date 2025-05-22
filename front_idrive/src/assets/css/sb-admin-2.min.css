@@ -1,0 +1,66 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    background: #2e3239;
+    color: white;
+    padding-top: 90px;
+    position: fixed;
+    height: 100%;
+    align-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+
+.main-content {
+    margin-left: 220px;
+    padding: 20px;
+    width: calc(100% - 220px);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra contenido horizontalmente */
+    justify-content: center; /* Centra contenido verticalmente */
+    height: 100vh;
+}
+
+.brand-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff9800;
+    text-align: center;
+    margin-top: 20px; /* Ajustar para que no lo cubra la navbar */
+}
+
+.welcome-message {
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+}
+.sidebar a {
+    color: white;
+    padding: 10px 15px;
+    display: block;
+    text-decoration: none;
+    transition: 0.2s;
+  }
+  
+  .sidebar a:hover {
+    background-color: var(--sidebar-active);
+    color: #ff9800;
+  }
+  
+  .sidebar .active {
+    background-color: var(--sidebar-active);
+    color: #000;
+  }
+
+  /* Contenedor de contenido principal */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left 0.3s;
+}

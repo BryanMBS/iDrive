@@ -1,0 +1,85 @@
+/* Estilos del sidebar */
+.sidebar {
+  width: 280px;
+  height: 100%;
+  background: linear-gradient(180deg, #6d6d6d 10%, #6d6d6d 100%);
+  color: white;
+  padding-top: 20px;
+  transition: width 0.3s ease-in-out;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/* Contenedor de contenido */
+#content-wrapper {
+  margin-left: 250px;  /* Ajusta el contenido para que no se superponga al sidebar */
+  flex-grow: 1;        /* Permite que el contenido ocupe el resto del espacio disponible */
+  padding: 20px;       /* Espaciado alrededor del contenido */
+}
+
+/* Estilos de los enlaces del sidebar */
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.sidebar a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+/* Título y separación en el sidebar */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 15px;
+}
+
+.sidebar-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  margin: 10px 0;
+}
+
+/* Estilos de los elementos de navegación */
+.nav-item {
+  list-style: none;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+.nav-link i {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Estilos del botón para ocultar o mostrar el sidebar */
+.sidebar-toggle {
+  text-align: center;
+  padding: 10px;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.1);
+}
