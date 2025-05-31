@@ -201,6 +201,6 @@ Gracias a Dios, a los instructores del SENA, y a todas las personas que apoyaron
 
 ## 📝 Licencia <a name="licencia"></a>
 
-Este proyecto está licenciado bajo la licencia MIT. Consulta el archivo [LICENSE.md](https://github.com/BryanMBS/IDRIVE/LICENSE.MD) para más información.
+Este proyecto está licenciado bajo la licencia MIT. Consulta el archivo [LICENSE.md](https://github.com/BryanMBS/IDRIVE/LICENSE.md) para más información.
 
 <p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
