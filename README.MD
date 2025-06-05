@@ -60,6 +60,7 @@ iDrive está diseñada para optimizar los procesos administrativos y mejorar la 
 - Bootstrap
 - React Bootstrap
 - Axios
+- React icons
 - React Router DOM
 - React Toastify
 - FontAwesome
