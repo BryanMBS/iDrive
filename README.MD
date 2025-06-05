@@ -32,7 +32,7 @@
 
 # 📖 Acerca del Proyecto <a name="acerca-del-proyecto"></a>
 
-**IDRIVE** iDrive es una aplicación web desarrollada para gestionar usuarios y clases de manera eficiente en escuelas de conducción. Utiliza FastAPI para el backend y React para el frontend, ofreciendo funcionalidades completas como:
+**IDRIVE** iDrive es una aplicación web desarrollada para que las escuelas de conduccion y sus estudiantes puedan gestionar sus clases de manera eficiente. Utiliza FastAPI para el backend y React para el frontend, ofreciendo funcionalidades completas como:
 
 Creación, edición, eliminación y búsqueda de usuarios.
 
