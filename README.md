@@ -32,7 +32,7 @@
 
 # 📖 Acerca del Proyecto <a name="acerca-del-proyecto"></a>
 
-**IDRIVE** es una aplicación web diseñada para gestionar usuarios de manera eficiente. Desarrollada con **FastAPI** en el backend y **React** en el frontend, permite la creación, edición, eliminación y búsqueda de usuarios con validación de datos, control de roles y cifrado de contraseñas.
+**IDRIVE** es una aplicación web diseñada para que las escuelas de conduccion y sus estudiantes puedan gestionar sus clases teoricas de manera eficiente. Desarrollada con **FastAPI** en el backend y **React** en el frontend, permite la creación, edición, eliminación y búsqueda de usuarios y clases con validación de datos, control de roles y cifrado de contraseñas.
 
 ---
 
