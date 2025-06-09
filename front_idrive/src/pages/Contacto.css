@@ -1,0 +1,67 @@
+/* src/pages/Contact.css */
+
+/* Importamos la paleta de colores para consistencia */
+@import url('./Home.css'); 
+
+._CT_contact-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--light-bg); /* Un fondo claro y suave */
+}
+
+._CT_main-content {
+    flex: 1;
+    padding-top: 100px; /* Espacio para la navbar fija */
+}
+
+._CT_page-title {
+    font-weight: 700;
+    color: var(--secondary-color);
+}
+
+._CT_contact-card {
+    border: none;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 0.5rem;
+    height: 100%;
+}
+
+._CT_form-title, ._CT_info-title {
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+._CT_submit-btn {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    font-weight: bold;
+    padding: 10px 25px;
+}
+._CT_submit-btn:hover {
+    background-color: var(--primary-color-hover) !important;
+    border-color: var(--primary-color-hover) !important;
+}
+
+._CT_info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+._CT_info-icon {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+._CT_info-item p {
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+._CT_map-container iframe {
+    border-radius: 0.375rem;
+}

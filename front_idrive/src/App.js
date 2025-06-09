@@ -7,6 +7,7 @@ import "./assets/css/sb-admin-2.min.css";
 import Agendamientos from "./pages/Agendamientos";
 import Usuarios from "./pages/Usuarios";
 import Clases from "./pages/Clases";
+import Contacto from "./pages/Contacto";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                 <Route path="/Agendamientos" element={<Agendamientos />} />
                 <Route path="/Usuarios" element={<Usuarios />} />
                 <Route path="/Clases" element={<Clases />} />
+                <Route path="/Contacto" element={<Contacto />} />
             </Routes>
         </Router>
     );

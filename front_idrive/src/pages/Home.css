@@ -1,143 +1,130 @@
-/* Paleta de colores de tu marca DRIVE */
+/* Paleta de colores consistente */
 :root {
-  /* Azul brillante para acciones principales, botones e íconos */
   --primary-color: #00ABE4; 
-  
-  /* Azul muy pálido para fondos de secciones */
-  --light-bg: #E9F1FA;
-  
-  /* Blanco para texto sobre fondos oscuros o de color */
+  --primary-color-hover: #008ECB;
+  --dark-bg: #2c3e50;
+  --light-bg: #f8f9fa;
   --white: #FFFFFF;
-
-  /* Gris oscuro para texto principal. Añadido para legibilidad. */
-  --secondary-color: #212529; 
+  --secondary-color: #343a40; 
 }
 
-.home-page {
+/* --- ESTRUCTURA PARA PANTALLA COMPLETA Y FOOTER FIJO --- */
+._HM_home-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
-  font-family: 'Poppins', sans-serif; 
+._HM_home-content {
+  flex: 1; /* Permite que el contenido principal crezca y empuje el footer hacia abajo */
 }
 
 /* --- HERO SECTION --- */
-.hero-section {
+._HM_hero-section {
   background: linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('../assets/img/FondoHome.avif');
   background-size: cover;
   background-position: center;
-  padding: 120px 0;
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
+  padding: 160px 0 120px 0;
+  color: var(--white);
 }
 
-.hero-title {
-  font-size: 3.5rem;
+._HM_hero-title {
+  font-size: 3.2rem;
   font-weight: 700;
-  margin-bottom: 20px;
 }
 
-.hero-subtitle {
-  font-size: 1.25rem;
-  margin-bottom: 30px;
+._HM_hero-subtitle {
+  font-size: 1.2rem;
   font-weight: 300;
+  max-width: 700px;
+  margin: 1.5rem auto 2rem auto;
 }
 
-/* --- Estilos para los botones de Bootstrap con tus colores --- */
-.btn-primary {
+/* Estilos para el botón principal de Bootstrap dentro del Hero */
+._HM_hero-section .btn-primary {
   background-color: var(--primary-color) !important;
   border-color: var(--primary-color) !important;
-  box-shadow: none !important; /* Quita sombras por defecto si las hay */
+  padding: 12px 30px;
+  font-weight: bold;
+}
+._HM_hero-section .btn-primary:hover {
+  background-color: var(--primary-color-hover) !important;
+  border-color: var(--primary-color-hover) !important;
 }
 
-.btn-primary:hover {
-  /* Un tono ligeramente más oscuro para el efecto hover */
-  background-color: #0095c7 !important;
-  border-color: #0095c7 !important;
+/* --- FEATURES SECTION --- */
+._HM_features-section {
+    background-color: var(--white);
 }
 
-
-/* --- GENERAL SECTION STYLING --- */
-.section-title {
+._HM_section-title {
     font-weight: 700;
     color: var(--secondary-color);
     margin-bottom: 1rem;
 }
 
-.py-5 {
-    padding-top: 5rem !important;
-    padding-bottom: 5rem !important;
-}
-
-/* --- FEATURES SECTION --- */
-.features-section {
-    background-color: var(--white); /* Fondo blanco para esta sección */
-}
-
-.feature-card {
+._HM_feature-card {
     border: none;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.feature-card:hover {
+._HM_feature-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
-.feature-icon {
+._HM_feature-icon {
     font-size: 3rem;
-    color: var(--primary-color); /* Íconos con tu azul brillante */
+    color: var(--primary-color);
 }
 
 /* --- HOW IT WORKS SECTION --- */
-.how-it-works-section {
-    background-color: var(--light-bg); /* Usamos tu azul pálido para el fondo */
+._HM_how-it-works-section {
+    background-color: var(--light-bg);
 }
 
-.step {
-    margin-bottom: 2rem;
+._HM_image-illustration {
+  background-image: url('../assets/img/ImagenHome2.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  min-height: 350px;
 }
 
-.step-number {
+._HM_step {
+    margin-bottom: 1.5rem;
+}
+
+._HM_step-number {
     display: inline-block;
     width: 30px;
     height: 30px;
     line-height: 30px;
     text-align: center;
     border-radius: 50%;
-    background-color: var(--primary-color); /* Círculo con tu azul brillante */
+    background-color: var(--primary-color);
     color: var(--white);
     font-weight: bold;
     margin-right: 15px;
 }
 
-/* --- TESTIMONIOS --- */
-.testimonials-section {
-  background-color: var(--white);
-}
-
-.testimonials-section .blockquote {
-    font-size: 1.2rem;
-    font-style: italic;
-    color: #6c757d;
-}
-
-.testimonials-section .blockquote-footer {
-    font-style: normal;
-    color: var(--secondary-color);
-}
-
 /* --- FINAL CTA SECTION --- */
-.final-cta-section {
-    background-color: var(--primary-color); /* Fondo sólido con tu azul brillante */
+._HM_final-cta-section {
+    background-color: var(--dark-bg);
 }
 
-/* IMAGEN 2 */
-.image-illustration {
-  background-image: url('../assets/img/ImagenHome2.png'); /* ruta desde carpeta public */
-  background-size: 100%;
-  background-position: center;
-  width: 100%;
-  height: 350px; /* ajusta según necesidad */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+/* Footer.css */
+
+.footer {
+    background-color: transparent; /* Un color de fondo sólido */
+    color: white;
+    padding: 5px 0;
+    text-align: center;
+    width: 100%;
+    /* Se elimina 'position: fixed' y 'bottom: 0' por completo */
 }

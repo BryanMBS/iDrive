@@ -1,10 +1,6 @@
-/* Importante: El body NO debe tener estilos aquí que afecten a otras páginas.
-   Cualquier estilo global del body (como font-family, margin, etc.) debe estar
-   en un archivo CSS global como App.css o index.css. */
-
 /* El login-container_Login ahora manejará su propio fondo */
 .login-container_Login {
-    background-image: url('../assets/img/FondoLoginDef.png'); /* ¡Asegúrate de que esta ruta sea correcta! */
+    background-image: url('../assets/img/FondoLogin2.png'); /* ¡Asegúrate de que esta ruta sea correcta! */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -31,11 +27,11 @@
     width: 100%;
     height: 100%;
     /* Degradado azulado sutil */
-    background: linear-gradient(to bottom, rgba(26, 46, 64, 0.4) 0%, rgba(0, 105, 177, 0.6) 100%);
+    background: linear-gradient to bottom, rgba(26, 46, 64, 0.4) 0%;
     z-index: 1;
 }
 
-/* Login Box Styling - SIN ANIMACIÓN DE ENTRADA */
+/* Login Box Styling */
 .login-box_Login {
     position: relative;
     z-index: 2;
@@ -44,22 +40,19 @@
     padding: 40px;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); /* Sombra para efecto flotante */
     text-align: center;
-    width: 90%;
-    max-width: 400px;
+    width: 95%;
+    max-width: 450px;
+    height: 400px;
+    max-height: 95%;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.15); /* Borde sutil */
-    /* REMOVIDA: animation: fadeInScale_Login 0.8s ease-out forwards; */
     transform-origin: center center;
     overflow: hidden;
     margin: 0;
-    /* Aseguramos que esté visible desde el inicio si la animación se quita */
     opacity: 1;
     transform: scale(1);
 }
-
-/* REMOVIDO: @keyframes fadeInScale_Login {...} */
-
 
 /* Avatar Placeholder */
 .avatar-placeholder_Login {
@@ -183,10 +176,8 @@
     margin-top: 30px;
     font-size: 0.75em;
     opacity: 0.8;
-    /* REMOVIDA: animation: fadeIn_Login 2s ease-out forwards; */
-}
 
-/* REMOVIDO: @keyframes fadeIn_Login {...} */
+}
 
 
 /* Responsive Adjustments */
