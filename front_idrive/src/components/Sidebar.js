@@ -1,20 +1,22 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react"; // Para manejar el estado de los submenús
-import "./Sidebar.css"; // Asegúrate de que esta ruta sea correcta
+import { useState } from "react";
+import "./Sidebar.css";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Hook para obtener la ubicación actual
+  const location = useLocation();
 
-  // Estado para controlar la apertura/cierre del sidebar en móviles (si aplica)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
+  // --- CAMBIO: La lógica de logout ahora es local en este componente ---
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Elimina el token de forma segura
-    navigate("/login"); // Redirige al login
+    // Se eliminan los datos de sesión directamente de localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    // Se redirige al usuario a la página de login
+    navigate("/login");
   };
 
-  // Función para cerrar el sidebar en móviles al hacer clic en un enlace
   const handleLinkClick = () => {
     if (isSidebarOpen) {
       setIsSidebarOpen(false);
@@ -22,22 +24,16 @@ const Sidebar = () => {
   };
 
   return (
-    // Asegúrate de que todas las clases CSS estén prefijadas con _SD
     <ul className={`_SD_sidebar ${isSidebarOpen ? "_SD_open" : ""}`}>
-      {/* Botón para alternar el sidebar en móviles (si se implementa) */}
-      {/* <button className="_SD_sidebar-toggler" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-        <i className="fas fa-bars"></i>
-      </button> */}
-
       {/* Logo y nombre de iDrive */}
       <Link className="_SD_sidebar-brand" to="/dashboard" onClick={handleLinkClick}>
         <div className="_SD_sidebar-brand-icon">
-          <i className="fas fa-car-side"></i> {/* Icono de Font Awesome */}
+          <i className="fas fa-car-side"></i>
         </div>
         <div className="_SD_sidebar-brand-text">iDrive</div>
       </Link>
 
-      <hr className="_SD_sidebar-divider _SD_my-0" /> {/* my-0 para reducir margen vertical */}
+      <hr className="_SD_sidebar-divider _SD_my-0" />
 
       {/* Elementos del menú principal */}
       <li className={`_SD_nav-item ${location.pathname === "/dashboard" ? "_SD_active" : ""}`}>
@@ -53,13 +49,8 @@ const Sidebar = () => {
           <span>Agendamientos</span>
         </Link>
       </li>
-
-      <li className={`_SD_nav-item ${location.pathname === "/inscripciones" ? "_SD_active" : ""}`}>
-        <Link className="_SD_nav-link" to="/inscripciones" onClick={handleLinkClick}>
-          <i className="fas fa-file-signature"></i>
-          <span>Inscripciones</span>
-        </Link>
-      </li>
+      
+      {/* Se elimina el link a Inscripciones que no existe en App.js */}
 
       <li className={`_SD_nav-item ${location.pathname === "/usuarios" ? "_SD_active" : ""}`}>
         <Link className="_SD_nav-link" to="/usuarios" onClick={handleLinkClick}>
@@ -75,21 +66,17 @@ const Sidebar = () => {
         </Link>
       </li>
 
-      {/* Las clases de Bootstrap como 'd-none' y 'd-md-block' generalmente no se prefijan,
-          pero si quieres que tu CSS sobrescriba cualquier Bootstrap o si no usas Bootstrap,
-          deberías incluirlas con prefijo en tu CSS y aquí. */}
-      <hr className="_SD_sidebar-divider _SD_d-none _SD_d-md-block" /> {/* Separador visible solo en escritorio */}
+      <hr className="_SD_sidebar-divider" />
 
       {/* Botón de Cerrar Sesión */}
-      {/* Si usas Bootstrap y quieres que estas clases sigan siendo de Bootstrap,
-          no las prefijes. Si quieres que TODO sea personalizado y evitar conflictos,
-          prefíjalas y define sus estilos en tu CSS con _SD.
-          Aquí las he prefijado para consistencia con la solicitud. */}
-      <div className="_SD_logout-btn-container _SD_text-center _SD_p-3 _SD_mt-auto">
-        <button className="_SD_btn _SD_btn-logout" onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt _SD_me-2"></i> Cerrar Sesión
-        </button>
-      </div>
+      <li className="_SD_nav-item _SD_mt-auto">
+        <div className="_SD_logout-btn-container">
+          <button className="_SD_btn-logout" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </li>
     </ul>
   );
 };

@@ -1,0 +1,215 @@
+/* Estilos base para el área de contenido */
+.content-area_User {
+    flex-grow: 1;
+    padding: 2rem;
+    background-color: #f8f9fc;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Estilos para la cabecera (título y botón principal) */
+.usuarios-header {
+    border-bottom: 1px solid #e3e6f0;
+    padding-bottom: 1rem;
+}
+
+.usuarios-title {
+    color: #5a5c69;
+    font-size: 1.75rem;
+}
+
+/* Estilos para botones genéricos */
+.btn_User {
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.35rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.btn-primary_User {
+    background-color: #4e73df;
+    color: white;
+}
+.btn-primary_User:hover {
+    background-color: #2e59d9;
+}
+
+.btn-edit_User {
+    background-color: #1cc88a;
+    color: white;
+}
+.btn-edit_User:hover {
+    background-color: #17a673;
+}
+
+.btn-delete_User {
+    background-color: #e74a3b;
+    color: white;
+}
+.btn-delete_User:hover {
+    background-color: #d73a2c;
+}
+
+/* Estilos para la tabla */
+.usuarios-table {
+    background-color: white;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    border-radius: 0.35rem;
+}
+
+.usuarios-table thead th {
+    background-color: #f8f9fc;
+    color: #4e73df;
+    font-weight: bold;
+    border-bottom: 2px solid #e3e6f0;
+}
+
+.usuarios-table tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+/* Estilos para el Modal */
+.modal-overlay_User {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.modal-container_User {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-title_User {
+    margin-bottom: 1rem;
+    color: #5a5c69;
+}
+
+.modal-input_User, .modal-select_User, .modal-textarea_User {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d3e2;
+    border-radius: 0.35rem;
+    font-size: 1rem;
+}
+.modal-input_User:disabled, .modal-textarea_User:disabled {
+    background-color: #f8f9fc;
+    cursor: not-allowed;
+}
+
+.modal-buttons_User {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-save_User {
+    background-color: #4e73df;
+    color: white;
+}
+.btn-save_User:hover {
+    background-color: #2e59d9;
+}
+
+.btn-cancel_User {
+    background-color: #858796;
+    color: white;
+}
+.btn-cancel_User:hover {
+    background-color: #717384;
+}
+
+
+/* --- INICIO DE ESTILOS RESPONSIVOS --- */
+
+/* Se aplica a pantallas con un ancho máximo de 768px (tablets y móviles) */
+@media screen and (max-width: 768px) {
+
+    /* Ajusta el área de contenido para que tenga más espacio en los bordes */
+    .content-area_User {
+        padding: 15px;
+    }
+
+    /* --- Cabecera Flexible --- */
+    .usuarios-header {
+        flex-direction: column; /* Apila el título y el botón verticalmente */
+        align-items: flex-start; /* Alinea los elementos a la izquierda */
+        gap: 15px; /* Añade un espacio entre el título y el botón */
+    }
+
+    /* --- Tabla Responsiva (Conversión a Tarjetas) --- */
+    .usuarios-table {
+        border: none; /* Quitamos el borde general de la tabla */
+    }
+
+    .usuarios-table thead {
+        /* Ocultamos la cabecera original de la tabla en móviles */
+        display: none;
+    }
+
+    .usuarios-table tr {
+        display: block; /* Cada fila se comportará como un bloque (tarjeta) */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .usuarios-table td {
+        display: flex; /* Usamos flexbox para alinear el label y el contenido */
+        justify-content: space-between; /* El label a la izquierda, el valor a la derecha */
+        padding: 10px 5px;
+        text-align: right; /* Alineamos el texto del contenido a la derecha */
+        border-bottom: 1px dotted #ccc; /* Separador entre "campos" de la tarjeta */
+    }
+
+    .usuarios-table td:last-child {
+        border-bottom: none; /* El último campo no necesita separador */
+    }
+
+    /* Usamos un pseudo-elemento para crear las etiquetas (labels) que ocultamos en la cabecera */
+    .usuarios-table td::before {
+        content: attr(data-label); /* El contenido será el texto del atributo 'data-label' */
+        font-weight: bold;
+        text-align: left;
+        padding-right: 15px;
+        color: #5a5c69; /* Le damos un color más oscuro al label */
+    }
+    
+    /* Ajustes para la celda de acciones */
+    .usuarios-table .acciones-buttons_User {
+        display: flex;
+        justify-content: flex-end; /* Alineamos los botones a la derecha */
+        gap: 10px; /* Espacio entre botones */
+        padding-top: 10px;
+    }
+
+    .usuarios-table .acciones-buttons_User::before {
+        display: none; /* Ocultamos el label para el contenedor de botones */
+    }
+
+    /* --- Modal Ajustable --- */
+    .modal-container_User {
+        width: 95%; /* El modal ocupa casi todo el ancho */
+        max-height: 90vh; /* Altura máxima para evitar que se salga de la pantalla */
+        overflow-y: auto; /* Habilitamos el scroll vertical si el contenido es muy largo */
+    }
+}
