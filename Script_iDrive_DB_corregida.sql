@@ -121,3 +121,25 @@ INSERT INTO Clases (nombre_clase, fecha_hora_inicio, fecha_hora_fin, id_profesor
 VALUES 
 ('Mecanica 1', '2025-03-10 09:00:00', '2025-03-10 11:00:00', 2, 1, 25),
 ('Normas de transito 1', '2025-03-10 11:00:00', '2025-03-10 12:00:00', 2, 2, 20);
+
+
+CREATE TABLE Notificaciones (
+    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
+    mensaje TEXT NOT NULL,
+    leida BOOLEAN DEFAULT FALSE,
+    fecha_creacion DATETIME DEFAULT NOW(),
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+CREATE TABLE LogsActividad (
+    id_log INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    accion VARCHAR(50) NOT NULL,
+    tabla_afectada VARCHAR(50),
+    registro_id INT,
+    fecha_accion DATETIME DEFAULT NOW(),
+    detalles JSON,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);

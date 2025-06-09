@@ -1,229 +1,267 @@
-/* Estilos generales */
-body {
-  background-color: #f8f9fa;
-  font-family: Arial, sans-serif;
+/* Usuarios.css */
+
+/* Variables de color para el proyecto (ajústalas a tus colores base) */
+:root {
+    --primary-color_User: #007bff; /* Un azul para botones principales, ajústalo al color primario de tu app */
+    --secondary-color_User: #6c757d; /* Gris para botones secundarios */
+    --success-color_User: #28a745; /* Verde para acciones de éxito */
+    --danger-color_User: #dc3545; /* Rojo para eliminar */
+    --warning-color_User: #ffc107; /* Amarillo para editar */
+    --info-color_User: #17a2b8; /* Azul claro para información */
+    --light-bg_User: #f8f9fa; /* Fondo claro */
+    --dark-text_User: #343a40; /* Texto oscuro */
+    --border-color_User: #dee2e6; /* Color de borde */
+    --white_User: #ffffff;
+    --shadow_User: rgba(0, 0, 0, 0.08);
 }
 
-/* Estilos del contenedor principal (después de la sidebar) */
-.container-fluid {
-  margin-left: 250px; /* Espacio para la sidebar */
-  padding: 30px;
-  background-color: white;
-  min-height: 100vh;
+/* Estilos para el contenedor principal de tu aplicación, si `d-flex`
+  es el que contiene tanto el Sidebar como el área de contenido principal.
+  Esto es crucial cuando el Sidebar es `position: fixed`.
+*/
+.main-layout-container {
+    display: flex; /* Ya lo tienes en el JSX, pero lo refuerzo aquí */
+    min-height: 100vh; /* Para que ocupe toda la altura de la ventana */
 }
 
-/* Header con el título y el botón para crear usuario */
+/* Este div contendrá todo el contenido "no-sidebar".
+  Se encargará de ocupar el espacio restante y empujar su contenido.
+*/
+.content-area_User {
+    flex-grow: 1; /* Esto hace que ocupe todo el espacio horizontal restante */
+    margin-left: 250px; /* Desplaza el contenido principal a la derecha, creando el espacio del sidebar */
+    width: calc(100% - 250px); /* Ocupa el ancho restante, importante para el diseño responsivo del contenido interno */
+    overflow-x: hidden; /* Evita que el contenido desborde horizontalmente */
+}
+
+
+/* Contenedor principal del componente Usuarios */
+.usuarios-container {
+    padding: 30px;
+    background-color: var(--light-bg_User);
+    min-height: 100vh; /* Asegura que este contenedor ocupe la altura de su padre (.content-area_User) */
+    width: 100%; /* Ocupará el 100% del .content-area_User */
+}
+
 .usuarios-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--border-color_User);
+    padding-bottom: 15px;
+    align-items: center;
 }
 
-.usuarios-header h2 {
-  font-size: 24px;
-  font-weight: bold;
+.usuarios-title {
+    color: var(--dark-text_User);
+    font-weight: 600;
 }
 
-.custom-btn-crear-usuario {
-  background-color: #007bff; /* color primario de Bootstrap */
-  color: white;
-  border-radius: 4px;
-  padding: 8px 15px;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-  border: none;
+/* Estilos para el botón de "Crear Usuario" */
+.btn_User {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
 }
 
-.custom-btn-crear-usuario:hover {
-  background-color: #0056b3; /* color de hover */
-  cursor: pointer;
+.btn_User:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
-.custom-btn-crear-usuario:focus {
-  outline: none;
-  box-shadow: none;
+.btn-primary_User {
+    background-color: var(--primary-color_User);
+    color: var(--white_User);
+    box-shadow: 0 4px 8px var(--shadow_User);
 }
 
-/* Barra de búsqueda */
-input.form-control {
-  max-width: 300px;
-  margin-bottom: 20px;
+/* Estilos para la barra de búsqueda */
+.search-input-group_User {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px var(--shadow_User);
+}
+
+.search-input_User {
+    border: 1px solid var(--border-color_User);
+    border-right: none;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 8px 0 0 8px;
+}
+
+.search-input_User:focus {
+    border-color: var(--primary-color_User);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.btn-outline-secondary_User {
+    background-color: var(--white_User);
+    border: 1px solid var(--border-color_User);
+    color: var(--secondary-color_User);
+    border-left: none;
+    padding: 10px 15px;
+    border-radius: 0 8px 8px 0;
+}
+
+.btn-outline-secondary_User:hover {
+    background-color: var(--light-bg_User);
+    color: var(--primary-color_User);
 }
 
 /* Estilos de la tabla de usuarios */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.usuarios-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden; /* Para que los border-radius se apliquen */
+    box-shadow: 0 5px 15px var(--shadow_User);
+    background-color: var(--white_User);
+    width: 100%; /* Asegura que la tabla ocupe el ancho disponible */
 }
 
-th,
-td {
-  padding: 10px;
-  text-align: left;
+.usuarios-table thead {
+    background-color: var(--primary-color_User); /* Color de fondo del encabezado de tabla */
+    color: var(--white_User);
 }
 
-thead {
-  background-color: #f8f9fa;
-  font-weight: bold;
+.usuarios-table th,
+.usuarios-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color_User);
 }
 
-tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+.usuarios-table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
-tbody tr:hover {
-  background-color: #e9ecef;
+.usuarios-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
-/* Botones de acciones en la tabla */
-button.btn {
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 4px;
+.usuarios-table tbody tr:hover {
+    background-color: var(--light-bg_User);
+    transition: background-color 0.2s ease-in-out;
 }
 
-button.btn-warning {
-  background-color: #ffc107;
-  color: white;
-  border: none;
+/* Estilos para los botones de acción en la tabla */
+.acciones-buttons_User .btn_User {
+    font-size: 0.85rem;
+    padding: 7px 12px;
+    border-radius: 5px;
 }
 
-button.btn-warning:hover {
-  background-color: #e0a800;
+.btn-edit_User {
+    background-color: var(--warning-color_User); /* Amarillo */
+    color: var(--dark-text_User);
 }
 
-button.btn-danger {
-  background-color: #dc3545;
-  color: white;
-  border: none;
+.btn-edit_User:hover {
+    background-color: darken(var(--warning-color_User), 10%); /* Más oscuro al pasar el ratón */
 }
 
-button.btn-danger:hover {
-  background-color: #c82333;
+.btn-delete_User {
+    background-color: var(--danger-color_User); /* Rojo */
+    color: var(--white_User);
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1050;
+.btn-delete_User:hover {
+    background-color: darken(var(--danger-color_User), 10%); /* Más oscuro al pasar el ratón */
 }
 
-.modal-container {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 400px;
+
+/* Estilos para el Modal */
+.modal-overlay_User {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; /* Por encima de todo */
+    backdrop-filter: blur(3px); /* Efecto de desenfoque */
 }
 
-.modal-container h4 {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
+.modal-container_User {
+    background-color: var(--white_User);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px var(--shadow_User);
+    width: 90%;
+    max-width: 500px;
+    animation: fadeInScale 0.3s ease-out forwards; /* Animación de entrada */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espacio entre los elementos del formulario */
 }
 
-.modal-container input,
-.modal-container select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.modal-buttons {
-  display: flex;
-  justify-content: space-between;
+.modal-title_User {
+    color: var(--dark-text_User);
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.8rem;
 }
 
-.modal-button {
-  padding: 8px 15px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.modal-input_User,
+.modal-select_User {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color_User);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
 }
 
-.modal-button.guardar {
-  background-color: #28a745;
-  color: white;
+.modal-input_User:focus,
+.modal-select_User:focus {
+    border-color: var(--primary-color_User);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
 }
 
-.modal-button.guardar:hover {
-  background-color: #218838;
+.modal-buttons_User {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espacio entre los botones */
+    margin-top: 30px;
 }
 
-.modal-button.cancelar {
-  background-color: #dc3545;
-  color: white;
+.modal-buttons_User .btn_User {
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 8px;
+    flex-grow: 1; /* Para que ocupen el espacio disponible */
+    max-width: 150px; /* Tamaño máximo para los botones */
 }
 
-.modal-button.cancelar:hover {
-  background-color: #c82333;
+.btn-save_User {
+    background-color: var(--success-color_User); /* Un color para guardar, puedes usar el primario */
+    color: var(--white_User);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
 }
 
-/* Asegurar que la página ocupe el 100% del alto */
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* Ajustar el tamaño de la sidebar */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 250px;
-  background-color: #343a40;
-  color: white;
-  padding-top: 20px;
-  z-index: 1040;
-}
-
-.sidebar .sidebar-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.sidebar .sidebar-header img {
-  width: 40px;
-  height: 40px;
-}
-
-.sidebar .sidebar-header h3 {
-  font-size: 18px;
-  color: white;
-}
-
-.sidebar .sidebar-menu {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar .sidebar-menu li {
-  margin: 10px 0;
-}
-
-.sidebar .sidebar-menu li a {
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-  display: block;
-}
-
-.sidebar .sidebar-menu li a:hover {
-  background-color: #495057;
+.btn-cancel_User {
+    background-color: var(--secondary-color_User);
+    color: var(--white_User);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
 }

@@ -1,34 +1,27 @@
-from fastapi import APIRouter, HTTPException, status
+# Roles.py
+from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel
 from typing import List
-from Clever_MySQL_conn import cleverCursor, mysqlConn
+from Clever_MySQL_conn import get_db_connection, logger
 
-rolesRtr = APIRouter()
+# --- Buena Práctica: Prefijos de API Consistentes ---
+rolesRtr = APIRouter(prefix="/roles", tags=['Gestion de Roles'])
 
-# Modelo Pydantic para validación de datos
-class RolesDB(BaseModel):
+# --- Modelos Pydantic ---
+class Role(BaseModel):
+    id_rol: int
     nombre_rol: str
-
-@rolesRtr.get("/Roles/", response_model=List[RolesDB], status_code=status.HTTP_200_OK, tags=['Gestion de roles'])
-async def get_roles():
+    
+#------------------------------------------------------------------------------------------------------------------------------------------
+# Endpoint para obtener todos los roles de usuario
+@rolesRtr.get("/", response_model=List[Role], summary="Obtener todos los roles de usuario")
+def get_roles(db_conn=Depends(get_db_connection)):
     try:
-        selectAll_query = 'SELECT nombre_rol FROM roles'
-        cleverCursor.execute(selectAll_query)
-        result = cleverCursor.fetchall()
-
-        # Si no se obtienen resultados, retornamos una lista vacía
-        if not result:
-            return []
-
-        # Reformatear los datos para devolver una lista de diccionarios
-        roles = [{"nombre_rol": row[0]} for row in result]
-
-        return roles
+        cursor = db_conn.cursor(dictionary=True)
+        cursor.execute('SELECT id_rol, nombre_rol FROM Roles ORDER BY nombre_rol')
+        result = cursor.fetchall()
+        cursor.close()
+        return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener roles: {str(e)}")
-
-
-
-
-
-
+        logger.error(f"Error al obtener roles: {e}")
+        raise HTTPException(status_code=500, detail="Error al obtener roles.")

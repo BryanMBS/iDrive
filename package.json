@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/react": "^6.1.17",
+    "axios": "^1.9.0",
+    "bootstrap": "^5.3.6",
+    "react-bootstrap": "^2.10.10",
     "react-toastify": "^11.0.5"
   }
 }

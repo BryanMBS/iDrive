@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import "./assets/css/sb-admin-2.min.css";
 import Agendamientos from "./pages/Agendamientos";
 import Usuarios from "./pages/Usuarios";
+import Clases from "./pages/Clases";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
                 <Route path="/Login" element={<Login />} />
                 <Route path="/Agendamientos" element={<Agendamientos />} />
                 <Route path="/Usuarios" element={<Usuarios />} />
+                <Route path="/Clases" element={<Clases />} />
             </Routes>
         </Router>
     );

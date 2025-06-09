@@ -1,148 +1,202 @@
-# Importamos las librerías necesarias de FastAPI, HTTPException y status
-from fastapi import APIRouter, HTTPException, status
-# Importamos la clase BaseModel de pydantic
-from pydantic import BaseModel
-# Importamos las conexiones a MySQL desde Clever_MySQL_conn
-from Clever_MySQL_conn import cleverCursor, mysqlConn, mysql
+# Clases.py
+from fastapi import APIRouter, HTTPException, status, Depends
+from pydantic import BaseModel, Field
+from typing import Optional, List
+import mysql.connector
 from datetime import datetime
+from Clever_MySQL_conn import get_db_connection, logger
 
+clasesRtr = APIRouter(prefix="/clases", tags=['Gestion de Clases'])
 
-# Creamos un enrutador de API llamado 
-clasesRtr = APIRouter()
+# --- Modelos Pydantic ---
 
-class clasesDB(BaseModel):
+class ClaseCreate(BaseModel):
     nombre_clase: str
+    descripcion: Optional[str] = None
     fecha_hora: datetime
     id_profesor: int
     id_salon: int
+    cupos_disponibles: int = Field(gt=0)
+    duracion_minutos: int = Field(default=60, gt=0)
 
-@clasesRtr.get("/Clases/", status_code=status.HTTP_302_FOUND, tags=['Gestion de clases'])
-async def get_users():
-  selectAll_query = 'SELECT id_clase, nombre_clase, fecha_hora, id_profesor, id_salon FROM Clases'
-  cleverCursor.execute(selectAll_query)
-  result = cleverCursor.fetchall()
-  return result
+class ClaseResponse(ClaseCreate):
+    id_clase: int
+    fecha_creacion: datetime
+    fecha_actualizacion: datetime
 
-#Router para programar clases
-@clasesRtr.post("/Crear_clase", status_code=status.HTTP_201_CREATED, tags=['Gestion de clases'])
-def insert_user(clasePost: clasesDB):
-    insert_query = """
-    INSERT INTO clases (nombre_clase, fecha_hora, id_profesor, id_salon)
-    VALUES (%s, %s, %s, %s)
+    class Config:
+        from_attributes = True
+
+class ClaseUpdate(BaseModel):
+    nombre_clase: Optional[str] = None
+    descripcion: Optional[str] = None
+    fecha_hora: Optional[datetime] = None
+    id_profesor: Optional[int] = None
+    id_salon: Optional[int] = None
+    cupos_disponibles: Optional[int] = Field(None, gt=0)
+    duracion_minutos: Optional[int] = Field(None, gt=0)
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
+# Endpoint para crear una nueva clase
+
+@clasesRtr.post("/", response_model=ClaseResponse, status_code=status.HTTP_201_CREATED)
+def create_clase(clase_data: ClaseCreate, db_conn=Depends(get_db_connection)):
     """
-    
-    values = (clasePost.nombre_clase, clasePost.fecha_hora, clasePost.id_profesor, clasePost.id_salon)
-    
-
-    try:
-        cleverCursor.execute(insert_query, values)
-        mysqlConn.commit()
-    except mysqlConn.connector.Error as err:
-        raise HTTPException(status_code=400, detail=f"Error: {err}")
-
-    return {"message": "Clase creada correctamente."}
-
-#Router para actualizar clases
-@clasesRtr.put("/Editar_clase/{clase_id}", status_code=status.HTTP_200_OK, tags=['Gestion de clases'])
-def update_clase(clase_id: int, clasePut: clasesDB):
-    update_query = """
-    UPDATE Clases 
-    SET nombre_clase = %s, fecha_hora = %s, id_profesor = %s, id_salon = %s
-    WHERE id_clase = %s
+    Crea una nueva clase en la base de datos.
     """
-    values = (clasePut.nombre_clase, clasePut.fecha_hora, clasePut.id_profesor, clasePut.id_salon, clase_id)
-
-    try:
-        cleverCursor.execute(update_query, values)
-        mysqlConn.commit()
-        if cleverCursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Clase no encontrada")
-    except mysqlConn.connector.Error as err:
-        raise HTTPException(status_code=400, detail=f"Error: {err}")
-
-    return {"message": "La clase se ha modificado correctamente."}
-
-
-  
-  #Router para eliminar clases
-@clasesRtr.delete("/Borrar_clase/{id_clase}", status_code=status.HTTP_200_OK, tags=['Gestion de clases'])
-def delete_clases_by_id(id_clase: int):
-    delete_query = "DELETE FROM Clases WHERE id_clase = %s"
-    values = (id_clase,)
-
-    try:
-        cleverCursor.execute(delete_query, values)
-        mysqlConn.commit()
-
-        if cleverCursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Clase no encontrada")
-
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=f"Error en la eliminación: {err}")
-
-    return {"message": "Clase eliminada correctamente."}
-
-#Router para obtener todas las clases
-@clasesRtr.get("/Clases_Calendario", status_code=status.HTTP_200_OK, tags=["Gestion de clases"])
-def obtener_clases_calendario():
     query = """
-    SELECT 
-        c.id_clase,
-        c.nombre_clase,
-        c.fecha_hora,
-        COUNT(a.id_agendamiento) AS usuarios_registrados
-    FROM clases c
-    LEFT JOIN agendamientos a 
-        ON c.id_clase = a.id_clase AND a.estado = 'aprobado'
-    GROUP BY c.id_clase, c.nombre_clase, c.fecha_hora
-    ORDER BY c.fecha_hora
+    INSERT INTO Clases (nombre_clase, descripcion, fecha_hora, id_profesor, id_salon,
+        cupos_disponibles, duracion_minutos, fecha_creacion, fecha_actualizacion)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
     """
+    values = (clase_data.nombre_clase, clase_data.descripcion, clase_data.fecha_hora,
+              clase_data.id_profesor, clase_data.id_salon, clase_data.cupos_disponibles,
+              clase_data.duracion_minutos)
 
     try:
-        cleverCursor.execute(query)
-        resultados = cleverCursor.fetchall()
-        clases = [
-            {
-                "id": fila[0],
-                "titulo": fila[1],
-                "fecha": fila[2].isoformat(),
-                "usuarios_registrados": fila[3]
-            }
-            for fila in resultados
-        ]
-        return clases
+        cursor = db_conn.cursor(dictionary=True)
+        cursor.execute(query, values)
+        new_clase_id = cursor.lastrowid
+        db_conn.commit()
+
+        # Obtener la clase recién creada para la respuesta
+        cursor.execute("SELECT * FROM Clases WHERE id_clase = %s", (new_clase_id,))
+        new_clase = cursor.fetchone()
+        cursor.close()
+
+        if not new_clase:
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "No se pudo recuperar la clase creada.")
+            
+        logger.info(f"Clase creada con ID: {new_clase_id}")
+        return new_clase
     except mysql.connector.Error as err:
-        raise HTTPException(status_code=400, detail=f"Error al obtener clases: {err}")
+        db_conn.rollback()
+        if err.errno == 1452:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Profesor o Salón no encontrado.")
+        logger.error(f"Error de base de datos al crear clase: {err}")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error de base de datos al crear clase.")
 
+#-----------------------------------------------------------------------------------------------------------------------------------------
+# Endpoint para obtener todas las clases
 
-#Router para obtener clases disponibles
-# Este endpoint devuelve una lista de clases disponibles que tienen cupos disponibles
-@clasesRtr.get("/ClasesDisponibles/", status_code=status.HTTP_200_OK, tags=["Gestion de clases"])
-def obtener_clases_disponibles():
-    query = """
-    SELECT id_clase, nombre_clase, fecha_hora, cupos_disponibles
-    FROM Clases
-    WHERE cupos_disponibles > 0
-    ORDER BY fecha_hora
+@clasesRtr.get("/", response_model=List[ClaseResponse])
+def get_clases(db_conn=Depends(get_db_connection)):
     """
+    Obtiene todas las clases registradas en la base de datos.
+    """
+    query = "SELECT * FROM Clases ORDER BY fecha_hora DESC"
+    
     try:
-        cleverCursor.execute(query)
-        resultados = cleverCursor.fetchall()
-        clases = []
-
-        for fila in resultados:
-            clase = {
-                "id_clase": fila[0],
-                "nombre_clase": fila[1],
-                "fecha_hora": fila[2].isoformat(),
-                "cupos_disponibles": fila[3]
-            }
-            clases.append(clase)
+        cursor = db_conn.cursor(dictionary=True)
+        cursor.execute(query)
+        clases = cursor.fetchall()
+        cursor.close()
 
         if not clases:
-            raise HTTPException(status_code=404, detail="No hay clases disponibles actualmente.")
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "No se encontraron clases.")
 
+        logger.info(f"Se encontraron {len(clases)} clases.")
         return clases
-
     except mysql.connector.Error as err:
-        raise HTTPException(status_code=500, detail=f"Error al obtener clases disponibles: {err}")
+        logger.error(f"Error al obtener clases: {err}")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error al consultar la base de datos.")
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
+
+# Endpoint para obtener una clase específica por ID
+@clasesRtr.get("/{id_clase}", response_model=ClaseResponse)
+def get_clase(id_clase: int, db_conn=Depends(get_db_connection)):
+    """
+    Obtiene los detalles de una clase específica por su ID.
+    """
+    query = "SELECT * FROM Clases WHERE id_clase = %s"
+    
+    try:
+        cursor = db_conn.cursor(dictionary=True)
+        cursor.execute(query, (id_clase,))
+        clase = cursor.fetchone()
+        cursor.close()
+
+        if not clase:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Clase no encontrada.")
+
+        logger.info(f"Clase obtenida con ID: {id_clase}")
+        return clase
+    except mysql.connector.Error as err:
+        logger.error(f"Error al obtener clase: {err}")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error al consultar la base de datos.")
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
+# Endpoint para actualizar una clase existente
+@clasesRtr.put("/{id_clase}", response_model=ClaseResponse)
+def update_clase(id_clase: int, clase_data: ClaseUpdate, db_conn=Depends(get_db_connection)):
+    """
+    Actualiza los detalles de una clase existente.
+    """
+    query = """
+    UPDATE Clases
+    SET nombre_clase = COALESCE(%s, nombre_clase),
+        descripcion = COALESCE(%s, descripcion),
+        fecha_hora = COALESCE(%s, fecha_hora),
+        id_profesor = COALESCE(%s, id_profesor),
+        id_salon = COALESCE(%s, id_salon),
+        cupos_disponibles = COALESCE(%s, cupos_disponibles),
+        duracion_minutos = COALESCE(%s, duracion_minutos),
+        fecha_actualizacion = NOW()
+    WHERE id_clase = %s
+    """
+    
+    values = (
+        clase_data.nombre_clase, clase_data.descripcion, clase_data.fecha_hora,
+        clase_data.id_profesor, clase_data.id_salon, clase_data.cupos_disponibles,
+        clase_data.duracion_minutos, id_clase
+    )
+
+    try:
+        cursor = db_conn.cursor(dictionary=True)
+        cursor.execute(query, values)
+        db_conn.commit()
+
+        if cursor.rowcount == 0:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Clase no encontrada o no se realizaron cambios.")
+
+        # Obtener la clase actualizada para la respuesta
+        cursor.execute("SELECT * FROM Clases WHERE id_clase = %s", (id_clase,))
+        updated_clase = cursor.fetchone()
+        cursor.close()
+
+        logger.info(f"Clase actualizada con ID: {id_clase}")
+        return updated_clase
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        if err.errno == 1452:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Profesor o Salón no encontrado.")
+        logger.error(f"Error de base de datos al actualizar clase: {err}")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error de base de datos al actualizar clase.")
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
+# Endpoint para eliminar una clase
+
+@clasesRtr.delete("/{id_clase}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_clase(id_clase: int, db_conn=Depends(get_db_connection)):
+    """
+    Elimina una clase existente por su ID.
+    """
+    query = "DELETE FROM Clases WHERE id_clase = %s"
+    
+    try:
+        cursor = db_conn.cursor()
+        cursor.execute(query, (id_clase,))
+        db_conn.commit()
+        cursor.close()
+
+        if cursor.rowcount == 0:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Clase no encontrada.")
+
+        logger.info(f"Clase eliminada con ID: {id_clase}")
+    except mysql.connector.Error as err:
+        db_conn.rollback()
+        logger.error(f"Error al eliminar clase: {err}")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error al consultar la base de datos.")
+
+#-----------------------------------------------------------------------------------------------------------------------------------------

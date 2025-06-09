@@ -1,157 +1,331 @@
-/* General */
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f8f9fc;
-  color: #333;
+/* Agendamientos.css - Diseño Moderno y Adaptativo */
+
+/* Variables CSS para una gestión más fácil de colores */
+:root {
+  --azul-oscuro: #2C3E50; /* Usado para texto principal y fondos de eventos */
+  --azul-claro: #E9F1FA; /* Fondo principal */
+  --azul-brillante: #00ABE4; /* Botones de acción, enlaces */
+  --blanco: #FFFFFF;
+  --gris-claro-borde: #D1D8DD; /* Bordes de inputs */
+  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra para elementos */
+  --transicion-rapida: 0.2s ease-in-out;
+  --transicion-normal: 0.3s ease-in-out;
 }
 
-/* Layout principal con sidebar */
-.agendamientos-wrapper {
-  display: flex;
-}
-
+/* Estilos generales del contenedor principal */
 .main-content {
-  margin-left: 250px;
-  padding: 30px;
-  width: 100%;
+  padding: 30px; /* Aumentamos el padding para más espacio */
+  background-color: var(--azul-claro); /* Azul claro para el fondo principal */
+  border-radius: 12px; /* Ligeramente más redondeado */
+  box-shadow: var(--sombra-suave); /* Sombra para dar profundidad */
+  margin-left: 250px; /* Ajusta según el ancho de tu Sidebar */
+  transition: margin-left var(--transicion-normal);
+  flex-grow: 1; /* Permite que ocupe el espacio disponible */
+  display: flex;
+  flex-direction: column;
 }
 
-/* Botones superiores */
+/* Título del calendario */
+.main-content h2 {
+  color: var(--azul-oscuro);
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: 700; /* Más audaz */
+  font-size: 2.2rem;
+}
+
+/* Contenedor de botones de agendamiento */
 .agendamiento-botones {
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 30px; /* Más espacio */
+  gap: 15px; /* Espacio entre botones */
+}
+
+/* Estilos de los botones de acción */
+.btn-agendar,
+.btn-cancelar {
+  padding: 12px 25px; /* Más padding */
+  border: none;
+  border-radius: 8px; /* Bordes más redondeados */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transicion-rapida), transform var(--transicion-rapida);
+  font-size: 1.05rem;
+  color: var(--blanco);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil en botones */
 }
 
 .btn-agendar {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  background-color: var(--azul-brillante);
 }
 
 .btn-agendar:hover {
-  background-color: #218838;
-  cursor: pointer;
+  background-color: #008ECB; /* Un poco más oscuro al pasar el ratón */
+  transform: translateY(-3px); /* Efecto de "levantar" */
 }
 
 .btn-cancelar {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  background-color: #dc3545; /* Rojo estándar para cancelar por seguridad */
 }
 
 .btn-cancelar:hover {
   background-color: #c82333;
-  cursor: pointer;
+  transform: translateY(-3px);
 }
 
-/* Calendario */
+/* FullCalendar específicos */
 .fc {
-  width: 100% !important;
+  font-family: 'Arial', sans-serif; /* Fuente más común y limpia */
 }
 
-.fc-event {
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 4px;
-  padding: 5px;
-  font-weight: bold;
-  font-size: 14px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.fc .fc-toolbar-title {
+  color: var(--azul-oscuro);
+  font-size: 2rem;
+  font-weight: 700;
 }
 
-.fc-event:hover {
-  background-color: #45a049;
+.fc .fc-button {
+  background-color: var(--azul-brillante);
+  border-color: var(--azul-brillante);
+  color: var(--blanco);
+  transition: background-color var(--transicion-rapida);
+  border-radius: 6px; /* Botones de navegación redondeados */
+  padding: 8px 15px;
+  font-weight: 600;
+}
+
+.fc .fc-button:hover {
+  background-color: #008ECB;
+  border-color: #008ECB;
+  transform: translateY(-1px);
+}
+
+/* Celdas de los días del calendario (bordes redondeados) */
+.fc-daygrid-day {
+  border-radius: 8px; /* Bordes redondeados para cada día */
+  overflow: hidden; /* Asegura que el contenido no se desborde */
+  border: 1px solid var(--gris-claro-borde); /* Borde sutil */
+  background-color: var(--blanco); /* Fondo blanco para los días */
+  transition: background-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+
+/* Estilo para el día actual */
+.fc-day-today {
+  background-color: var(--azul-claro) !important; /* Azul claro para el día actual */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para destacarlo */
+  border-color: var(--azul-brillante); /* Borde con color primario */
+}
+
+/* Número del día */
+.fc-daygrid-day-top {
+  padding: 8px;
+  font-weight: 600;
+  color: var(--azul-oscuro);
+}
+
+/* Eventos en el calendario */
+.fc-daygrid-event {
+  background-color: var(--azul-oscuro); /* Azul oscuro para los eventos */
+  border-color: var(--azul-oscuro);
+  color: var(--blanco);
+  padding: 4px 8px;
+  border-radius: 5px; /* Bordes redondeados para eventos */
+  font-size: 0.9em;
+  white-space: normal;
+  margin-bottom: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra sutil en eventos */
+  transition: transform var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+
+.fc-daygrid-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilo al hacer click en un día (solo para visualización, no funcional en FullCalendar directo) */
+.fc-daygrid-day-frame:hover {
+  background-color: rgba(0, 171, 228, 0.1); /* Overlay azul brillante suave al pasar el ratón */
   cursor: pointer;
 }
 
-.fc-toolbar-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-}
 
-.fc-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-}
-
-.fc-button:hover {
-  background-color: #0056b3;
-}
-
-.fc-header-toolbar {
-  margin-bottom: 20px;
-}
-
-/* Modal */
+/* Modal Overlay */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex; align-items: center; justify-content: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
+/* Contenedor del Modal */
 .modal-container {
-  background-color: white;
+  background: var(--blanco);
   padding: 30px;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border-radius: 12px;
+  box-shadow: var(--sombra-suave);
+  width: 90%;
+  max-width: 500px; /* Aumentamos el tamaño máximo para los listados de clases */
+  animation: fadeInScale var(--transicion-normal);
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Más espacio entre elementos */
 }
 
-.modal-container input,
-.modal-container select {
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-container h4,
+.modal-container h5 {
+  margin-top: 0;
+  color: var(--azul-oscuro);
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* Inputs y Selects del Modal */
+.modal-input,
+.modal-select {
   width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 15px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  padding: 12px;
+  border: 1px solid var(--gris-claro-borde);
+  border-radius: 8px; /* Más redondeado */
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
 }
 
-/* Botones dentro del modal */
+.modal-input:focus,
+.modal-select:focus {
+  border-color: var(--azul-brillante);
+  box-shadow: 0 0 0 3px rgba(0, 171, 228, 0.25); /* Sombra de enfoque */
+  outline: none;
+}
+
+/* Botones dentro del Modal */
 .modal-buttons {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 15px;
+  justify-content: space-around;
+  margin-top: 25px;
+  gap: 15px;
 }
 
 .modal-button {
   flex: 1;
-  padding: 10px;
-  font-size: 15px;
+  padding: 12px 15px;
   border: none;
-  border-radius: 6px;
-  transition: background-color 0.3s ease;
+  border-radius: 8px; /* Más redondeado */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transicion-rapida), transform var(--transicion-rapida);
+  font-size: 1rem;
+  color: var(--blanco);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .modal-button.guardar {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--azul-brillante);
 }
 
 .modal-button.guardar:hover {
-  background-color: #0056b3;
+  background-color: #008ECB;
+  transform: translateY(-2px);
 }
 
 .modal-button.cancelar {
-  background-color: #6c757d;
-  color: white;
+  background-color: #6c757d; /* Gris para cancelar */
 }
 
 .modal-button.cancelar:hover {
   background-color: #5a6268;
+  transform: translateY(-2px);
 }
 
+/* Estilos específicos para el Modal de Clases del Día */
+.day-classes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.day-classes-list li {
+  background-color: var(--azul-claro);
+  border: 1px solid var(--gris-claro-borde);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: background-color var(--transicion-rapida);
+}
+
+.day-classes-list li:last-child {
+  margin-bottom: 0;
+}
+
+.day-classes-list li strong {
+  color: var(--azul-oscuro);
+  font-size: 1.1em;
+}
+
+.day-classes-list li span {
+  color: #555;
+  font-size: 0.95em;
+}
+
+
+/* Media Queries para Responsividad */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .agendamiento-botones {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .btn-agendar,
+  .btn-cancelar {
+    width: 100%;
+    margin-bottom: 0; /* Ya usamos gap */
+  }
+
+  .modal-container {
+    padding: 20px;
+    width: 95%;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-button {
+    width: 100%;
+    margin-bottom: 0; /* Ya usamos gap */
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.5rem;
+  }
+}

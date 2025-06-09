@@ -1,76 +1,55 @@
-# Importar la clase Union del módulo typing para manejar tipos de datos opcionales
-from typing import Union
-
-# Importar la clase FastAPI para crear la aplicación web
+# main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-# Importar el router desde el módulo iDriveAppRtr de BackAliante.Usuarios
+# Importar los routers refactorizados y finalizados
 from Usuarios import usuariosRtr
 from Salones import salonesRtr
 from Roles import rolesRtr
 from Clases import clasesRtr
 from Agendamientos import agendamientosRtr
-from Inscripciones import inscripcionesRtr
 
+# --- Buena Práctica: Creación Centralizada de la App ---
+iDriveApp = FastAPI(
+    title="API de iDriveApp",
+    description="API para la gestión de una escuela de conducción, incluyendo usuarios, clases y agendamientos.",
+    version="1.0.0"
+)
 
-# Importar el middleware de CORS para manejar solicitudes entre diferentes dominios
-from fastapi.middleware.cors import CORSMiddleware
+# --- Buena Práctica: Configuración de CORS ---
+# Configura el Intercambio de Recursos de Origen Cruzado para permitir que tu
+# aplicación de frontend se comunique con la API.
+origins = [
+    "http://localhost:3000", # Ejemplo para un frontend en React
+    "http://localhost:8080",
+    "http://127.0.0.1:3000"
+]
 
-# Crear una instancia de FastAPI
-iDriveApp = FastAPI()
+iDriveApp.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], # Permite todos los métodos (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"], # Permite todas las cabeceras
+)
 
-# Incluir el router desde el módulo
+# --- Buena Práctica: Enrutamiento Modular ---
+# Incluye cada router desde su respectivo módulo. Esto mantiene el archivo principal limpio
+# y organiza el proyecto por funcionalidad.
 iDriveApp.include_router(usuariosRtr)
 iDriveApp.include_router(rolesRtr)
 iDriveApp.include_router(salonesRtr)
 iDriveApp.include_router(clasesRtr)
 iDriveApp.include_router(agendamientosRtr)
-iDriveApp.include_router(inscripcionesRtr)
 
-
-
-# Definir los orígenes permitidos para las solicitudes CORS
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:3000",
-]
-
-# Añadir el middleware de CORS para permitir solicitudes desde los orígenes definidos
-iDriveApp.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-iDriveApp.include_router(agendamientosRtr)
-
-# Definir la ruta raíz que retorna un mensaje simple
-@iDriveApp.get("/")
+# Un endpoint raíz simple para comprobaciones de estado
+@iDriveApp.get("/", tags=["Root"])
 async def read_root():
-    return {"Hello": "World"}
+    """
+    Endpoint raíz para confirmar que la API está en funcionamiento.
+    """
+    return {"status": "ok", "message": "¡Bienvenido a la API de iDriveApp!"}
 
-# Definir una ruta que acepta un parámetro de consulta opcional 'q'
-@iDriveApp.get("/items/")
-async def read_param_item(q: Union[str, None] = None):
-    return {"q": q}
-
-# Definir una ruta que acepta un parámetro en la ruta 'item_id'
-@iDriveApp.get("/items/{item_id}")
-async def read_paramInPath_item(item_id: int):
-    return {"item_id": item_id}
-
-# Definir una ruta que acepta tanto un parámetro en la ruta 'item_id' como un parámetro de consulta opcional 'q'
-@iDriveApp.get("/items/{item_id}")
-async def read_both_paramTypes_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-# Definir una ruta para eliminar un ítem por su 'item_id'
-@iDriveApp.delete("/items_del/{item_id}")
-async def delete_by_id(item_id: int):
-    return {"resultado": "Se ha eliminado correctamente el item solicitado"}
-
+# Nota: Los archivos 'Inscripciones.py' y 'Login.py' han sido eliminados
+# ya que su funcionalidad ahora es manejada de manera correcta y más robusta
+# por 'Agendamientos.py' y 'Usuarios.py' respectivamente.

@@ -32,7 +32,17 @@
 
 # 📖 Acerca del Proyecto <a name="acerca-del-proyecto"></a>
 
-**IDRIVE** es una aplicación web diseñada para gestionar usuarios de manera eficiente. Desarrollada con **FastAPI** en el backend y **React** en el frontend, permite la creación, edición, eliminación y búsqueda de usuarios con validación de datos, control de roles y cifrado de contraseñas.
+**IDRIVE** iDrive es una aplicación web desarrollada para que las escuelas de conduccion y sus estudiantes puedan gestionar sus clases de manera eficiente. Utiliza FastAPI para el backend y React para el frontend, ofreciendo funcionalidades completas como:
+
+Creación, edición, eliminación y búsqueda de usuarios.
+
+Validación de datos y control de roles para garantizar una gestión segura.
+
+Cifrado de contraseñas para proteger la información de los usuarios.
+
+Creación y programación de clases teóricas, tanto para estudiantes como para administradores de academias.
+
+iDrive está diseñada para optimizar los procesos administrativos y mejorar la experiencia de estudiantes y personal de las escuelas de conducción.
 
 ---
 
@@ -50,6 +60,7 @@
 - Bootstrap
 - React Bootstrap
 - Axios
+- React icons
 - React Router DOM
 - React Toastify
 - FontAwesome
@@ -191,6 +202,6 @@ Gracias a Dios, a los instructores del SENA, y a todas las personas que apoyaron
 
 ## 📝 Licencia <a name="licencia"></a>
 
-Este proyecto está licenciado bajo la licencia MIT. Consulta el archivo [LICENSE.md](LICENSE.md) para más información.
+Este proyecto está licenciado bajo la licencia MIT. Consulta el archivo [LICENSE.md](https://github.com/BryanMBS/IDRIVE/LICENSE) para más información.
 
 <p align="right">(<a href="#readme-top">volver al inicio</a>)</p>

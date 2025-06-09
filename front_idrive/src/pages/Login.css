@@ -1,109 +1,209 @@
-/* Login.css */
+/* Importante: El body NO debe tener estilos aquí que afecten a otras páginas.
+   Cualquier estilo global del body (como font-family, margin, etc.) debe estar
+   en un archivo CSS global como App.css o index.css. */
 
-.login-container {
+/* El login-container_Login ahora manejará su propio fondo */
+.login-container_Login {
+    background-image: url('../assets/img/FondoLoginDef.png'); /* ¡Asegúrate de que esta ruta sea correcta! */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background-image: url(../assets/Fondo_Semaforo.jpg);
-    background-attachment: fixed; /* Mantiene la imagen de fondo fija */
-    background-position: center;
-    background-size: cover;
-    backdrop-filter: blur(15px);
-}
-
-.login-box {
-    position: relative;
-    width: 420px;
-    background: rgba(0, 0, 0, 0.336); /* Mayor contraste */
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    color: white;
-    border-radius: 25px;
-    padding: 30px 40px;
-    text-align: center;
-}
-
-/* Estilo del título */
-h2 {
-    color: rgb(35, 35, 35);
-    margin-bottom: 1rem;
-}
-
-/* Estilo del input-group */
-.input-group {
-    position: relative;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    background: rgb(255, 255, 255);
-    border-radius: 25px;
     overflow: hidden;
+    z-index: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #FFFFFF;
 }
 
-/* Estilo de los inputs */
-.input-group input {
-    width: 100%;
-    padding: 12px 15px;
-    border: none;
-    border-radius: 25px !important; /* Asegura bordes redondeados */
-    outline: none;
-    font-size: 17px;
-    background: rgba(0, 0, 0, 0.2);
-    color: rgb(0, 0, 0);
-    appearance: none;
-}
-
-/* Placeholder con mejor visibilidad */
-.input-group input::placeholder {
-    color: rgb(255, 255, 255);
-}
-
-/* Iconos dentro de los inputs */
-.input-group .icon {
+/* Overlay con degradado vertical en tonos azules */
+.login-container_Login::before {
+    content: '';
     position: absolute;
-    right: 15px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Degradado azulado sutil */
+    background: linear-gradient(to bottom, rgba(26, 46, 64, 0.4) 0%, rgba(0, 105, 177, 0.6) 100%);
+    z-index: 1;
+}
+
+/* Login Box Styling - SIN ANIMACIÓN DE ENTRADA */
+.login-box_Login {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.08); /* Fondo muy transparente, sin degradado */
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); /* Sombra para efecto flotante */
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Borde sutil */
+    /* REMOVIDA: animation: fadeInScale_Login 0.8s ease-out forwards; */
+    transform-origin: center center;
+    overflow: hidden;
+    margin: 0;
+    /* Aseguramos que esté visible desde el inicio si la animación se quita */
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* REMOVIDO: @keyframes fadeInScale_Login {...} */
+
+
+/* Avatar Placeholder */
+.avatar-placeholder_Login {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Input Group Styling - Línea inferior */
+.input-group_Login {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.input-group_Login .icon_Login {
+    position: absolute;
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: #000000;
+    color: #FFFFFF; /* Iconos en blanco */
+    opacity: 0.7;
+    font-size: 1.2em;
 }
 
-/* Opciones de recordar contraseña */
-.options {
+.input-group_Login input {
+    width: calc(100% - 30px);
+    padding: 10px 0;
+    margin-left: 30px;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4); /* Línea inferior */
+    background-color: transparent; /* Fondo transparente */
+    color: #FFFFFF;
+    font-size: 1em;
+    outline: none;
+}
+
+.input-group_Login input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+}
+
+/* Options (Remember Me, Forgot Password) - Estilo más compacto */
+.options_Login {
     display: flex;
     justify-content: space-between;
-    font-size: 15px;
-    color: white;
-    margin-bottom: 10px;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
 }
 
-.options a {
-    color: white;
+.options_Login label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.options_Login input[type="checkbox"] {
+    margin-right: 5px;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.options_Login input[type="checkbox"]:checked {
+    background-color: #00ABE4; /* Color azul al checkear */
+    border-color: #00ABE4;
+}
+
+.options_Login input[type="checkbox"]:checked::before {
+    content: '✔';
+    display: block;
+    color: #FFFFFF;
+    font-size: 12px;
+    text-align: center;
+    line-height: 16px;
+}
+
+.options_Login a {
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    transition: color 0.3s;
 }
 
-.options a:hover {
-    color: #ee9e00;
+.options_Login a:hover {
+    color: #FFFFFF;
 }
 
-/* Botón de inicio de sesión */
-.login-btn {
+/* Login Button - Estilo degradado azul */
+.login-btn_Login {
     width: 100%;
     padding: 12px;
     border: none;
-    border-radius: 25px;
-    background: #ee9e00;
-    font-size: 20px;
-    cursor: pointer;
-    transition: 0.3s;
+    border-radius: 10px;
+    background: linear-gradient(to right, #00ABE4, #00C6FF); /* Degradado azul */
+    color: #FFFFFF;
+    font-size: 1em;
     font-weight: bold;
-    color: black;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    outline: none;
 }
 
-.login-btn:hover {
-    background: #a77000;
-    color: white;
-    transform: scale(1.05);
+.login-btn_Login:hover {
+    background: linear-gradient(to right, #00C6FF, #00ABE4); /* Invertir degradado al pasar el mouse */
+}
+
+/* Footer Styling - Más discreto */
+.footer_Login {
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 30px;
+    font-size: 0.75em;
+    opacity: 0.8;
+    /* REMOVIDA: animation: fadeIn_Login 2s ease-out forwards; */
+}
+
+/* REMOVIDO: @keyframes fadeIn_Login {...} */
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .login-box_Login {
+        padding: 30px;
+        max-width: 350px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-box_Login {
+        padding: 25px;
+        max-width: 95%;
+        border-radius: 15px;
+    }
+    .input-group_Login {
+        margin-bottom: 25px;
+    }
 }

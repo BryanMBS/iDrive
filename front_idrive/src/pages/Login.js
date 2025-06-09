@@ -5,6 +5,9 @@ import './Login.css';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 
+// MEJORA: Usar variable de entorno para la URL de la API
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const Login = () => {
     const [correo, setCorreo] = useState('');
     const [password, setPassword] = useState('');
@@ -16,29 +19,44 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await axios.post('http://localhost:8000/Validacion_Login/', {
+            // CORRECCIÓN: Apuntar al endpoint de login correcto definido en el backend (`/usuarios/login`).
+            const response = await axios.post(`${API_URL}/usuarios/login`, {
                 correo_electronico: correo,
-                password: password
-            }, {
-                withCredentials: true
+                password: password,
             });
 
-            console.log(response.data);
-            alert('Inicio de sesión exitoso');
-            navigate('/dashboard'); // Redirige tras login
+            // CORRECCIÓN: El backend devuelve `token`, no `access_token`.
+            if (response.data && response.data.token) {
+                // MEJORA DE SEGURIDAD: Guardar el token de acceso en localStorage.
+                localStorage.setItem('token', response.data.token);
+                
+                alert('Inicio de sesión exitoso');
+                navigate('/dashboard'); // Redirige tras login
+            } else {
+                // Manejar el caso en que el login es exitoso pero no viene el token.
+                const errorMessage = 'Error de autenticación: La respuesta del servidor no contenía un token.';
+                setError(errorMessage);
+                console.error(errorMessage, response.data);
+            }
+
         } catch (err) {
-            console.error(err);
-            setError('Correo o contraseña incorrectos');
+            console.error("Error durante el inicio de sesión:", err);
+            // MEJORA: Mostrar error específico del backend si está disponible.
+            if (err.response?.data?.detail) {
+                setError(err.response.data.detail);
+            } else {
+                setError('Correo o contraseña incorrectos.');
+            }
         }
     };
 
     return (
-        <div className="login-container">
-            <div className="login-box">
+        <div className="login-container_Login">
+            <div className="login-box_Login">
                 <h2>Iniciar sesión</h2>
                 <form onSubmit={handleLogin}>
-                    <div className="input-group">
-                        <span className="icon"><FaUser /></span>
+                    <div className="input-group_Login">
+                        <span className="icon_Login"><FaUser /></span>
                         <input
                             type="text"
                             placeholder="Correo electrónico"
@@ -48,8 +66,8 @@ const Login = () => {
                         />
                     </div>
 
-                    <div className="input-group">
-                        <span className="icon"><FaLock /></span>
+                    <div className="input-group_Login">
+                        <span className="icon_Login"><FaLock /></span>
                         <input
                             type="password"
                             placeholder="Contraseña"
@@ -59,19 +77,19 @@ const Login = () => {
                         />
                     </div>
 
-                    {error && <p className="error-message">{error}</p>}
+                    {error && <p className="error-message_Login">{error}</p>}
 
-                    <div className="options">
+                    <div className="options_Login">
                         <label>
                             <input type="checkbox" /> Recuérdame
                         </label>
                         <a href="#">¿Olvidaste la contraseña?</a>
                     </div>
 
-                    <button type="submit" className="login-btn">Iniciar sesión</button>
+                    <button type="submit" className="login-btn_Login">Iniciar sesión</button>
                 </form>
             </div>
-            <Footer />
+            <Footer className="footer_Login" />
         </div>
     );
 };

@@ -1,78 +1,143 @@
-/* Home.css */
+/* Paleta de colores de tu marca DRIVE */
+:root {
+  /* Azul brillante para acciones principales, botones e íconos */
+  --primary-color: #00ABE4; 
+  
+  /* Azul muy pálido para fondos de secciones */
+  --light-bg: #E9F1FA;
+  
+  /* Blanco para texto sobre fondos oscuros o de color */
+  --white: #FFFFFF;
 
-.home-container {
-    background-image: url(../assets/Fondo_Semaforo.jpg);
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed; /* Mantiene la imagen de fondo fija */
-    height: 100vh;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    text-align: center;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    padding: 20px;
-    backdrop-filter: blur(25px); /* Suaviza el fondo */
-    position: relative;
+  /* Gris oscuro para texto principal. Añadido para legibilidad. */
+  --secondary-color: #212529; 
 }
 
-/* Caja de contenido centrado */
-.content {
-    background: rgba(0, 0, 0, 0.418); /* Mayor contraste */
-    padding: 40px;
-    border-radius: 25px;
-    text-align: center;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.708); /* Sombra elegante */
-    max-width: 600px;
-    width: 100%;
+.home-page {
+
+  font-family: 'Poppins', sans-serif; 
 }
 
-/* Estilo de títulos */
-.content h1 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    font-weight: bold;
+/* --- HERO SECTION --- */
+.hero-section {
+  background: linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('../assets/img/FondoHome.avif');
+  background-size: cover;
+  background-position: center;
+  padding: 120px 0;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
 }
 
-/* Botón estilizado */
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 30px;
+  font-weight: 300;
+}
+
+/* --- Estilos para los botones de Bootstrap con tus colores --- */
 .btn-primary {
-    width: 60%;
-    background-color: #ee9e00;
-    color: rgb(0, 0, 0);
-    padding: 12px 20px;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: 0.3s ease-in-out;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: none !important; /* Quita sombras por defecto si las hay */
 }
 
 .btn-primary:hover {
-    background: #a77000;
-    color: white;
-    transform: scale(1.05);
+  /* Un tono ligeramente más oscuro para el efecto hover */
+  background-color: #0095c7 !important;
+  border-color: #0095c7 !important;
 }
 
-/* Responsividad */
-@media (max-width: 768px) {
-    .home-container {
-        padding: 10px;
-    }
-    
-    .content {
-        width: 95%;
-        padding: 30px;
-    }
 
-    .content h1 {
-        font-size: 2rem;
-    }
+/* --- GENERAL SECTION STYLING --- */
+.section-title {
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
 
-    .btn-primary {
-        width: 80%;
-        font-size: 1rem;
-    }
+.py-5 {
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
+}
+
+/* --- FEATURES SECTION --- */
+.features-section {
+    background-color: var(--white); /* Fondo blanco para esta sección */
+}
+
+.feature-card {
+    border: none;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: var(--primary-color); /* Íconos con tu azul brillante */
+}
+
+/* --- HOW IT WORKS SECTION --- */
+.how-it-works-section {
+    background-color: var(--light-bg); /* Usamos tu azul pálido para el fondo */
+}
+
+.step {
+    margin-bottom: 2rem;
+}
+
+.step-number {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: var(--primary-color); /* Círculo con tu azul brillante */
+    color: var(--white);
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+/* --- TESTIMONIOS --- */
+.testimonials-section {
+  background-color: var(--white);
+}
+
+.testimonials-section .blockquote {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #6c757d;
+}
+
+.testimonials-section .blockquote-footer {
+    font-style: normal;
+    color: var(--secondary-color);
+}
+
+/* --- FINAL CTA SECTION --- */
+.final-cta-section {
+    background-color: var(--primary-color); /* Fondo sólido con tu azul brillante */
+}
+
+/* IMAGEN 2 */
+.image-illustration {
+  background-image: url('../assets/img/ImagenHome2.png'); /* ruta desde carpeta public */
+  background-size: 100%;
+  background-position: center;
+  width: 100%;
+  height: 350px; /* ajusta según necesidad */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

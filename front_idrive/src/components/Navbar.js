@@ -6,7 +6,8 @@ function NavigationBar() {
   return (
     <Navbar expand="lg" className="custom-navbar shadow-sm">
       <Container>
-        {/* Logo o Nombre del sistema */}
+        {/* Logo o Nombre del sistema */ 
+        }
         <Navbar.Brand as={Link} to="/" className="brand">
           iDrive
         </Navbar.Brand>
