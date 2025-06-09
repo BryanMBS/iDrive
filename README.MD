@@ -123,7 +123,8 @@ Instalará automáticamente las siguientes dependencias clave:
 - `react`, `react-router-dom`, `react-scripts`
 - `axios`, `bootstrap`, `react-bootstrap`
 - `react-toastify`, `react-icons`, `@fortawesome/fontawesome-free`
-- `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`
+- `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`, 
+- `@python-jose[cryptography]`, `@passlib[bcrypt]`
 
 ```bash
 npm start

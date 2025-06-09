@@ -240,4 +240,77 @@ INSERT INTO Usuarios (nombre, correo_electronico, telefono, cedula, password_has
 ('Bryan Mora', 'bryanmora18@gmail.com', '3167303517', '1019096837', 'Daki2025*', 'salt_ejemplo_5', 3);
 ('Administrador', 'administrador@idrive.com', '3001112222', '99999999', 'hash_ejemplo_admin1234', 'salt_ejemplo_6', 3);
 
+-- -----------------------------------------------------
+-- Tabla `Permisos`
+-- Define cada acción individual que se puede realizar en el sistema.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Permisos` (
+  `id_permiso` INT NOT NULL AUTO_INCREMENT,
+  `nombre_permiso` VARCHAR(100) NOT NULL,
+  `descripcion` VARCHAR(255) NULL,
+  PRIMARY KEY (`id_permiso`),
+  UNIQUE INDEX `nombre_permiso_UNIQUE` (`nombre_permiso` ASC)
+)
+ENGINE = InnoDB;
+
+-- Poblar la tabla de Permisos con las acciones clave de la aplicación
+INSERT INTO `Permisos` (`nombre_permiso`, `descripcion`) VALUES
+('usuarios:crear', 'Permite crear nuevos usuarios'),
+('usuarios:leer', 'Permite ver la lista de todos los usuarios'),
+('usuarios:editar', 'Permite editar la información de cualquier usuario'),
+('usuarios:eliminar', 'Permite eliminar cualquier usuario'),
+('clases:crear', 'Permite programar nuevas clases'),
+('clases:editar', 'Permite editar clases existentes'),
+('clases:eliminar', 'Permite eliminar clases programadas'),
+('agendamientos:crear:propio', 'Permite a un estudiante agendarse a una clase'),
+('agendamientos:crear:cualquiera', 'Permite a un administrador agendar a cualquier estudiante'),
+('agendamientos:ver:todos', 'Permite ver todos los agendamientos del sistema');
+
+
+-- -----------------------------------------------------
+-- Tabla `Roles_Permisos`
+-- Tabla de unión que establece la relación Muchos-a-Muchos
+-- entre los Roles y los Permisos.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Roles_Permisos` (
+  `id_rol` INT NOT NULL,
+  `id_permiso` INT NOT NULL,
+  PRIMARY KEY (`id_rol`, `id_permiso`),
+  INDEX `fk_Roles_Permisos_Permisos_idx` (`id_permiso` ASC),
+  INDEX `fk_Roles_Permisos_Roles_idx` (`id_rol` ASC),
+  CONSTRAINT `fk_Roles_Permisos_Roles`
+    FOREIGN KEY (`id_rol`)
+    REFERENCES `Roles` (`id_rol`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Roles_Permisos_Permisos`
+    FOREIGN KEY (`id_permiso`)
+    REFERENCES `Permisos` (`id_permiso`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+-- Asignar permisos a los roles existentes
+-- Asumimos: 1=Estudiante, 2=Profesor, 3=Administrador
+
+-- Permisos para Administrador (ID 3) - Tiene acceso a casi todo
+INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'usuarios:crear')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'usuarios:leer')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'usuarios:editar')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'usuarios:eliminar')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'clases:crear')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'clases:editar')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'clases:eliminar')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:crear:cualquiera')),
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:todos'));
+
+-- Permisos para Estudiante (ID 1) - Acciones limitadas
+INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
+(1, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:crear:propio'));
+
+-- Permisos para Profesor (ID 2) - Puede ver información relevante
+INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
+(2, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:todos'));
+
 COMMIT;
