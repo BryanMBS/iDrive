@@ -165,7 +165,6 @@ Este proyecto puede desplegarse en servicios como **Azure**, **Render**, o **Ver
 
 ## 🔭 Futuras Características <a name="futuras-caracteristicas"></a>
 
-- [ ] Gestión de clases y horarios
 - [ ] Panel de administración con estadísticas
 - [ ] Soporte multilenguaje
 
