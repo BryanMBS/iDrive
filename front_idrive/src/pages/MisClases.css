@@ -1,0 +1,191 @@
+/* src/pages/MisClases.css */
+
+/* --- Variables de Estilo para consistencia --- */
+:root {
+    --mc-color-primario: #0d6efd;
+    --mc-color-primario-hover: #0b5ed7;
+    --mc-color-fondo: #f8f9fa;
+    --mc-color-superficie: #ffffff;
+    --mc-color-texto-principal: #212529;
+    --mc-color-texto-secundario: #6c757d;
+    --mc-color-borde: #dee2e6;
+    --mc-sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --mc-radio-borde: 0.5rem;
+}
+
+/* --- Contenedor Principal de la Página --- */
+._MC_page-container {
+    flex-grow: 1;
+    padding: 2rem;
+    background-color: var(--mc-color-fondo);
+    /* CAMBIO CLAVE: Deja espacio para el Sidebar en escritorio */
+    margin-left: 250px; 
+    transition: margin-left 0.3s ease;
+}
+
+/* --- Cabecera de la Página --- */
+._MC_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--mc-color-borde);
+}
+
+._MC_header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--mc-color-texto-principal);
+}
+
+._MC_btn-primary {
+    background-color: var(--mc-color-primario);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--mc-radio-borde);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+._MC_btn-primary:hover {
+    background-color: var(--mc-color-primario-hover);
+}
+
+/* --- Grid para las Tarjetas de Clases --- */
+._MC_clases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+._MC_clase-card {
+    background-color: var(--mc-color-superficie);
+    border: 1px solid var(--mc-color-borde);
+    border-radius: var(--mc-radio-borde);
+    box-shadow: var(--mc-sombra-suave);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+._MC_clase-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+._MC_card-header {
+    padding: 1rem 1.25rem;
+    background-color: var(--mc-color-fondo);
+    border-bottom: 1px solid var(--mc-color-borde);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+._MC_card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--mc-color-texto-principal);
+}
+
+._MC_estado-badge {
+    padding: 0.3em 0.65em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 50rem;
+    color: white;
+    text-transform: capitalize;
+}
+
+/* Colores para cada estado */
+._MC_estado-pendiente { background-color: #ffc107; color: #000; }
+._MC_estado-confirmado { background-color: #198754; }
+._MC_estado-cancelado { background-color: #dc3545; }
+
+._MC_card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+._MC_card-body p {
+    margin: 0;
+    color: var(--mc-color-texto-secundario);
+    font-size: 0.9rem;
+}
+._MC_card-body p strong {
+    color: #343a40;
+    min-width: 80px;
+    display: inline-block;
+}
+
+._MC_no-clases {
+    color: var(--mc-color-texto-secundario);
+    font-style: italic;
+    padding: 2rem;
+    text-align: center;
+    background-color: var(--mc-color-superficie);
+    border-radius: var(--mc-radio-borde);
+}
+
+/* --- Estilos del Modal --- */
+._MC_modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+._MC_modal-container {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--mc-radio-borde);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+._MC_modal-container h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+._MC_modal-container p {
+    margin-bottom: 1.5rem;
+    color: var(--mc-color-texto-secundario);
+}
+._MC_modal-input, ._MC_modal-select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.5rem; /* Espacio sobre el select */
+    margin-bottom: 1.5rem; /* Espacio bajo el select */
+    border: 1px solid var(--mc-color-borde);
+    border-radius: var(--mc-radio-borde);
+}
+._MC_modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+._MC_btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--mc-radio-borde);
+    cursor: pointer;
+}
+
+/* --- Diseño Responsivo --- */
+@media (max-width: 768px) {
+    ._MC_page-container {
+        /* CAMBIO CLAVE: En móvil, el margen izquierdo desaparece */
+        margin-left: 0;
+        padding: 1rem;
+    }
+    ._MC_header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}

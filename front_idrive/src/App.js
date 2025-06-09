@@ -11,6 +11,7 @@ import Agendamientos from "./pages/Agendamientos";
 import Usuarios from "./pages/Usuarios";
 import Clases from "./pages/Clases";
 import Contacto from "./pages/Contacto";
+import MisClases from "./pages/MisClases"; 
 
 // Estilos
 import "./assets/css/sb-admin-2.min.css";
@@ -32,6 +33,7 @@ function App() {
                     {/* Rutas del Panel de Administración */}
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/agendamientos" element={<Agendamientos />} />
+                    <Route path="/mis-clases" element={<MisClases />} />
                     <Route path="/usuarios" element={<Usuarios />} />
                     <Route path="/clases" element={<Clases />} />
                 </Routes>

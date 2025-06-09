@@ -313,4 +313,18 @@ INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
 INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
 (2, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:todos'));
 
+-- Nuevos permisos para las vistas de agendamiento
+INSERT INTO `Permisos` (`nombre_permiso`, `descripcion`) VALUES
+('mis-clases:ver', 'Permite a un estudiante ver su propia lista de clases agendadas'),
+('agendamientos:ver:calendario', 'Permite a admins/profesores ver el calendario completo de agendamientos');
+
+-- Asignar el nuevo permiso al rol de Estudiante (ID 1)
+INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
+(1, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'mis-clases:ver'));
+
+-- Asignar el nuevo permiso a Administrador (ID 3) y Profesor (ID 2)
+INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
+(3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:calendario')),
+(2, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:calendario'));
+
 COMMIT;

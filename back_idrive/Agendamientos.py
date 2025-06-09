@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from mysql.connector import Error as MySQLC_Error
 from Clever_MySQL_conn import get_db_connection, logger
+from auth import has_permission, get_current_user
+from schemas import TokenData
 
 agendamientosRtr = APIRouter(prefix="/agendamientos", tags=['Gestion de Agendamiento'])
 
@@ -323,3 +325,34 @@ def confirmar_agendamiento(
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error de base de datos al confirmar agendamiento.")
 
 #---------------------------------------------------------------------------------------------------------------------------
+# --- NUEVO ENDPOINT PARA ESTUDIANTES ---
+@agendamientosRtr.get(
+    "/mis-agendamientos",
+    response_model=List[AgendamientoDetalle], # Reutilizamos el modelo detallado
+    summary="Obtener los agendamientos del usuario actual",
+    dependencies=[Depends(has_permission("mis-clases:ver"))] # Protegido por permiso
+)
+def get_mis_agendamientos(
+    current_user: TokenData = Depends(get_current_user),
+    db_conn=Depends(get_db_connection)
+):
+    """
+    Devuelve una lista de todas las clases agendadas por el estudiante
+    que ha iniciado sesión.
+    """
+    id_estudiante = current_user.id_usuario
+    
+    # Reutilizamos la consulta detallada pero filtrando por el ID del estudiante
+    query = f"{AGENDAMIENTO_DETALLE_QUERY} WHERE a.id_estudiante = %s ORDER BY c.fecha_hora DESC"
+    
+    try:
+        cursor = db_conn.cursor(dictionary=True)
+        cursor.execute(query, (id_estudiante,))
+        agendamientos = cursor.fetchall()
+        cursor.close()
+        
+        # Es normal que un estudiante nuevo no tenga agendamientos, así que no lanzamos 404
+        return agendamientos
+    except mysql.connector.Error as err:
+        logger.error(f"Error al obtener los agendamientos del estudiante {id_estudiante}: {err}")
+        raise HTTPException(status_code=500, detail="Error al consultar la base de datos.")
