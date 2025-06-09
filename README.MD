@@ -190,14 +190,6 @@ Si te gusta este proyecto, dale una estrella ⭐ en GitHub para apoyar su desarr
 
 ---
 
-## 🙏 Agradecimientos <a name="agradecimientos"></a>
-
-Gracias a Dios, a los instructores del SENA, y a todas las personas que apoyaron el desarrollo de este sistema.
-
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
-
----
-
 ## 📝 Licencia <a name="licencia"></a>
 
 Este proyecto está licenciado bajo la licencia MIT. Consulta el archivo [LICENSE.md](https://github.com/BryanMBS/IDRIVE/LICENSE) para más información.
