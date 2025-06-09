@@ -1,0 +1,46 @@
+# .github/workflows/frontend.yml
+
+name: CI Frontend - React
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+    paths:
+      - 'frontend/**' # Solo se ejecuta si hay cambios en la carpeta frontend
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x] # Prueba en versiones LTS de Node.js
+
+    steps:
+    - name: 1. Clonar el repositorio
+      uses: actions/checkout@v4
+
+    - name: 2. Configurar Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 3. Instalar dependencias
+      run: |
+        cd frontend # Navega a la carpeta del frontend
+        npm install
+
+    - name: 4. Ejecutar Linter
+      run: |
+        cd frontend
+        npm run lint # Asegúrate de tener un script "lint" en tu package.json
+
+    - name: 5. Crear Build de producción
+      run: |
+        cd frontend
+        npm run build
