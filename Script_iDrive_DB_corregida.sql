@@ -1,19 +1,30 @@
--- Creación de la base de datos
+-- =============================================
+-- Script Final para la Base de Datos iDrive
+-- Versión: Optimizada y Completa
+-- Fecha: 11/06/2025
+-- Combina normalización, índices, vistas, eventos y todas las tablas requeridas.
+-- =============================================
+
+-- Eliminar base de datos existente para una instalación limpia
+DROP DATABASE IF EXISTS DataBaseiDrive;
 CREATE DATABASE DataBaseiDrive;
 USE DataBaseiDrive;
 
--- Tabla de Roles
+-- Habilitar el programador de eventos si no está activo
+SET GLOBAL event_scheduler = ON;
+
+-- =============================================
+-- 1. ESTRUCTURA DE TABLAS
+-- =============================================
+
+-- Tabla de Roles: Define los tipos de usuario en el sistema.
 CREATE TABLE Roles (
     id_rol INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_rol VARCHAR(50) NOT NULL
-);
+    nombre_rol VARCHAR(50) NOT NULL UNIQUE,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 
-INSERT INTO Roles (nombre_rol) VALUES 
-('Estudiante'), 
-('Profesor'), 
-('Administrador');
-
--- Tabla de Usuarios (corregida)
+-- Tabla de Usuarios: Almacena la información de todos los usuarios.
 CREATE TABLE Usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -21,125 +32,212 @@ CREATE TABLE Usuarios (
     telefono VARCHAR(20),
     cedula VARCHAR(20) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    id_rol INT,
+    salt VARCHAR(64) NOT NULL,
+    id_rol INT NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ultimo_acceso TIMESTAMP NULL,
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo',
     FOREIGN KEY (id_rol) REFERENCES Roles(id_rol)
-);
+) ENGINE=InnoDB;
 
--- Inserts de usuarios corregidos
-INSERT INTO Usuarios (nombre, correo_electronico, telefono, cedula, password_hash, id_rol)
-VALUES 
-('Juan Pérez', 'juan.perez@example.com', '1234567890', '1020451233', 'hashed_password_juan', 1),
-('Ana López', 'ana.lopez@example.com', '0987654321', '10190298833', 'hashed_password_ana', 2),
-('Bryan Mora', 'bryanmora18@gmail.com', '3167303517', '1019096837', 'Daki2025*', 3),
-('Javier Quiroga', 'javiquiroga@gmail.com', '3156678899', '1000022345', 'Sena2025*', 3);
-
--- Tabla de Salones
+-- Tabla de Salones: Describe las aulas donde se imparten las clases.
 CREATE TABLE Salones (
     id_salon INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_salon VARCHAR(50) NOT NULL,
+    nombre_salon VARCHAR(50) NOT NULL UNIQUE,
     ubicacion VARCHAR(100) NOT NULL,
-    aforo INT NOT NULL
-);
+    aforo INT NOT NULL CHECK (aforo > 0),
+    equipamiento TEXT,
+    estado ENUM('disponible', 'mantenimiento') DEFAULT 'disponible'
+) ENGINE=InnoDB;
 
-INSERT INTO Salones (nombre_salon, ubicacion, aforo)
-VALUES 
-('Salon 201', 'Piso 2', 25),
-('Salon 101', 'Piso 1', 20);
-
--- Tabla de Clases modificada
+-- Tabla de Clases: Define las clases programadas.
 CREATE TABLE Clases (
     id_clase INT AUTO_INCREMENT PRIMARY KEY,
     nombre_clase VARCHAR(100) NOT NULL,
-    fecha_hora_inicio DATETIME NOT NULL,
-    fecha_hora_fin DATETIME NOT NULL,
-    id_profesor INT,
-    id_salon INT,
-    cupos_disponibles INT NOT NULL,
+    descripcion TEXT,
+    fecha_hora TIMESTAMP NOT NULL,
+    duracion_minutos INT NOT NULL DEFAULT 60,
+    id_profesor INT NOT NULL,
+    id_salon INT NOT NULL,
+    cupos_disponibles INT NOT NULL CHECK (cupos_disponibles >= 0),
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_profesor) REFERENCES Usuarios(id_usuario),
     FOREIGN KEY (id_salon) REFERENCES Salones(id_salon)
-);
+) ENGINE=InnoDB;
 
--- Tabla de Estados de Agendamiento
-CREATE TABLE EstadosAgendamiento (
-    id_estado INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_estado VARCHAR(20) NOT NULL
-);
-
-INSERT INTO EstadosAgendamiento (nombre_estado) 
-VALUES ('Pendiente'), ('Confirmado'), ('Cancelado');
-
--- Tabla de Agendamientos modificada
+-- Tabla de Agendamientos: Registra la reserva de una clase por un estudiante.
 CREATE TABLE Agendamientos (
     id_agendamiento INT AUTO_INCREMENT PRIMARY KEY,
     id_estudiante INT NOT NULL,
     id_clase INT NOT NULL,
-    fecha_reserva DATETIME NOT NULL DEFAULT NOW(),
-    estado INT NOT NULL DEFAULT 1,
+    fecha_reserva TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    estado ENUM('Pendiente', 'Confirmado', 'Cancelado') DEFAULT 'Pendiente',
+    metodo_reserva ENUM('web', 'movil', 'presencial') DEFAULT 'web',
+    fecha_confirmacion TIMESTAMP NULL,
     FOREIGN KEY (id_estudiante) REFERENCES Usuarios(id_usuario),
     FOREIGN KEY (id_clase) REFERENCES Clases(id_clase),
-    FOREIGN KEY (estado) REFERENCES EstadosAgendamiento(id_estado)
-);
+    UNIQUE KEY unique_agendamiento (id_estudiante, id_clase) -- Evita que un estudiante agende la misma clase dos veces
+) ENGINE=InnoDB;
 
--- Triggers actualizados
+-- Tabla de Inscripciones: Podría usarse para inscribir a un estudiante en un curso completo (conjunto de clases).
+CREATE TABLE Inscripciones (
+    id_inscripcion INT AUTO_INCREMENT PRIMARY KEY,
+    id_estudiante INT NOT NULL,
+    id_clase INT NOT NULL, -- O podría ser id_curso si existiera esa tabla
+    fecha_inscripcion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_estudiante) REFERENCES Usuarios(id_usuario),
+    FOREIGN KEY (id_clase) REFERENCES Clases(id_clase)
+) ENGINE=InnoDB;
+
+-- Tabla de Notificaciones: Para enviar mensajes a los usuarios.
+CREATE TABLE Notificaciones (
+  id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  titulo VARCHAR(100) NOT NULL,
+  mensaje TEXT NOT NULL,
+  leida TINYINT(1) DEFAULT 0,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+) ENGINE=InnoDB;
+
+-- Tabla de Logs de Actividad: Para auditoría del sistema.
+CREATE TABLE LogsActividad (
+  id_log INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT,
+  accion VARCHAR(50) NOT NULL,
+  tabla_afectada VARCHAR(50),
+  registro_id INT,
+  fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  detalles LONGTEXT,
+  FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Tabla de Configuración del Sistema: Parámetros clave-valor.
+CREATE TABLE ConfiguracionSistema (
+  id_config INT AUTO_INCREMENT PRIMARY KEY,
+  clave VARCHAR(50) UNIQUE NOT NULL,
+  valor VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- =============================================
+-- 2. ÍNDICES PARA OPTIMIZACIÓN DE CONSULTAS
+-- =============================================
+CREATE INDEX idx_clases_fecha ON Clases(fecha_hora);
+CREATE INDEX idx_agendamientos_estado ON Agendamientos(estado);
+CREATE INDEX idx_usuarios_rol ON Usuarios(id_rol);
+CREATE INDEX idx_notificaciones_usuario ON Notificaciones(id_usuario, leida);
+
+-- =============================================
+-- 3. VISTAS (Consultas almacenadas)
+-- =============================================
+
+-- Vista para monitorear el estado de los cupos y reservas de las clases
+CREATE VIEW vista_cupos_clases AS
+SELECT 
+    c.id_clase,
+    c.nombre_clase,
+    c.fecha_hora,
+    s.nombre_salon,
+    u.nombre AS nombre_profesor,
+    s.aforo AS aforo_total,
+    c.cupos_disponibles,
+    (s.aforo - c.cupos_disponibles) AS reservas_realizadas
+FROM Clases c
+JOIN Salones s ON c.id_salon = s.id_salon
+JOIN Usuarios u ON c.id_profesor = u.id_usuario
+ORDER BY c.fecha_hora;
+
+-- =============================================
+-- 4. TRIGGERS (Automatización de lógica de negocio)
+-- =============================================
 DELIMITER //
-CREATE TRIGGER before_insert_agendamiento
+
+-- Trigger que se dispara ANTES de insertar un agendamiento para verificar y reducir cupos.
+CREATE TRIGGER before_agendamiento_insert
 BEFORE INSERT ON Agendamientos
 FOR EACH ROW
 BEGIN
-    DECLARE cupos_restantes INT;
-
-    SELECT cupos_disponibles INTO cupos_restantes 
-    FROM Clases 
+    DECLARE cupos INT;
+    SELECT cupos_disponibles INTO cupos
+    FROM Clases
     WHERE id_clase = NEW.id_clase;
-
-    IF cupos_restantes <= 0 THEN
+    
+    IF cupos <= 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No hay cupos disponibles para esta clase.';
     END IF;
 
-    UPDATE Clases 
-    SET cupos_disponibles = cupos_disponibles - 1 
+    UPDATE Clases
+    SET cupos_disponibles = cupos_disponibles - 1
     WHERE id_clase = NEW.id_clase;
-END;
-//
-DELIMITER ;
+END//
 
-DELIMITER //
-CREATE TRIGGER after_delete_agendamiento
+-- Trigger que se dispara DESPUÉS de actualizar un agendamiento para devolver cupo si se cancela.
+CREATE TRIGGER after_agendamiento_update
+AFTER UPDATE ON Agendamientos
+FOR EACH ROW
+BEGIN
+    IF NEW.estado = 'Cancelado' AND OLD.estado != 'Cancelado' THEN
+        UPDATE Clases
+        SET cupos_disponibles = cupos_disponibles + 1
+        WHERE id_clase = OLD.id_clase;
+    END IF;
+END//
+
+-- Trigger que se dispara DESPUÉS de eliminar un agendamiento para devolver el cupo.
+CREATE TRIGGER after_agendamiento_delete
 AFTER DELETE ON Agendamientos
 FOR EACH ROW
 BEGIN
-    UPDATE Clases 
-    SET cupos_disponibles = cupos_disponibles + 1 
-    WHERE id_clase = OLD.id_clase;
-END;
-//
+    -- Solo se devuelve el cupo si la reserva no estaba ya cancelada
+    IF OLD.estado != 'Cancelado' THEN
+        UPDATE Clases
+        SET cupos_disponibles = cupos_disponibles + 1
+        WHERE id_clase = OLD.id_clase;
+    END IF;
+END//
+
 DELIMITER ;
 
--- Insert de ejemplo para clases (formato actualizado)
-INSERT INTO Clases (nombre_clase, fecha_hora_inicio, fecha_hora_fin, id_profesor, id_salon, cupos_disponibles)
-VALUES 
-('Mecanica 1', '2025-03-10 09:00:00', '2025-03-10 11:00:00', 2, 1, 25),
-('Normas de transito 1', '2025-03-10 11:00:00', '2025-03-10 12:00:00', 2, 2, 20);
+-- =============================================
+-- 5. EVENTOS PROGRAMADOS (Tareas de mantenimiento)
+-- =============================================
+DELIMITER //
 
+-- Evento que se ejecuta semanalmente para purgar agendamientos cancelados hace más de 30 días.
+CREATE EVENT purge_old_canceled_reservations
+ON SCHEDULE EVERY 1 WEEK
+DO
+BEGIN
+    DELETE FROM Agendamientos
+    WHERE estado = 'Cancelado'
+    AND fecha_reserva < DATE_SUB(NOW(), INTERVAL 30 DAY);
+END//
 
-CREATE TABLE Notificaciones (
-    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    titulo VARCHAR(100) NOT NULL,
-    mensaje TEXT NOT NULL,
-    leida BOOLEAN DEFAULT FALSE,
-    fecha_creacion DATETIME DEFAULT NOW(),
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
-);
+DELIMITER ;
 
-CREATE TABLE LogsActividad (
-    id_log INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT,
-    accion VARCHAR(50) NOT NULL,
-    tabla_afectada VARCHAR(50),
-    registro_id INT,
-    fecha_accion DATETIME DEFAULT NOW(),
-    detalles JSON,
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
-);
+-- =============================================
+-- 6. INSERCIÓN DE DATOS INICIALES (POBLACIÓN)
+-- =============================================
+
+-- Roles
+INSERT INTO Roles (nombre_rol) VALUES ('Estudiante'), ('Profesor'), ('Administrador');
+
+-- Salones
+INSERT INTO Salones (nombre_salon, ubicacion, aforo, equipamiento) VALUES
+('S201', 'Edificio Principal - Piso 2', 30, 'Proyector, Aire Acondicionado'),
+('S101', 'Edificio Secundario - Piso 1', 25, 'Pizarra Interactiva'),
+
+-- Usuarios (Contraseñas y salts son de ejemplo, deben ser generados de forma segura)
+INSERT INTO Usuarios (nombre, correo_electronico, telefono, cedula, password_hash, salt, id_rol) VALUES
+('Carlos Acosta', 'carlos.acosta@email.com', '3101112233', '1020304050', 'hash_ejemplo_1', 'salt_ejemplo_1', 1),
+('Lucia Méndez', 'lucia.mendez@email.com', '3114445566', '1030405060', 'hash_ejemplo_2', 'salt_ejemplo_2', 1),
+('Roberto Gómez', 'roberto.gomez@profes.com', '3127778899', '2010203040', 'hash_ejemplo_3', 'salt_ejemplo_3', 2),
+('Ana Jurado', 'ana.jurado@admin.com', '3130001122', '3040506070', 'hash_ejemplo_4', 'salt_ejemplo_4', 3);
+('Bryan Mora', 'bryanmora18@gmail.com', '3167303517', '1019096837', 'Daki2025*', 'salt_ejemplo_5', 3);
+('Administrador', 'administrador@idrive.com', '3001112222', '99999999', 'hash_ejemplo_admin1234', 'salt_ejemplo_6', 3);
+
+COMMIT;

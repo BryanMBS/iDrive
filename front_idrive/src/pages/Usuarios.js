@@ -1,18 +1,23 @@
+// Usuarios.js
+
 import React, { useEffect, useState, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import axios from 'axios';
 import "./Usuarios.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// MEJORA: URL de la API centralizada desde variables de entorno
+//---------------------------------------------
+// CONFIGURACIÓN DE AXIOS
+//---------------------------------------------
+// URL de la API centralizada desde variables de entorno.
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-// MEJORA: Instancia de Axios para centralizar la configuración y la autenticación
+// Instancia de Axios para centralizar la configuración y la autenticación.
 const apiClient = axios.create({
   baseURL: API_URL,
 });
 
-// MEJORA DE SEGURIDAD: Interceptor que añade el token de autenticación a cada petición
+// Interceptor que añade el token de autenticación a cada petición.
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -23,7 +28,13 @@ apiClient.interceptors.request.use(config => {
   return Promise.reject(error);
 });
 
+//---------------------------------------------
+// COMPONENTE PRINCIPAL DE GESTIÓN DE USUARIOS
+//---------------------------------------------
 const Usuarios = () => {
+  //---------------------------------------------
+  // ESTADOS DEL COMPONENTE
+  //---------------------------------------------
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,6 +43,7 @@ const Usuarios = () => {
   const [busqueda, setBusqueda] = useState("");
   const [errorApi, setErrorApi] = useState(null);
 
+  // Estado para el formulario de creación/edición de usuarios.
   const [formulario, setFormulario] = useState({
     nombre: "",
     correo_electronico: "",
@@ -41,39 +53,44 @@ const Usuarios = () => {
     id_rol: "",
   });
 
-  // MEJORA: Funciones de fetch refactorizadas con Axios y useCallback
+  //---------------------------------------------
+  // FUNCIONES PARA OBTENER DATOS DE LA API
+  //---------------------------------------------
   const fetchUsuarios = useCallback(async () => {
     setErrorApi(null);
     try {
-      // CORRECCIÓN: Apuntar al endpoint correcto del backend (`/usuarios/`)
       const response = await apiClient.get("/usuarios/");
       setUsuarios(response.data || []);
     } catch (err) {
       console.error("Error al cargar usuarios:", err);
       setErrorApi(`No se pudieron cargar los usuarios: ${err.response?.data?.detail || err.message}.`);
-      setUsuarios([]); // Asegurar que el estado es un array vacío en caso de error
+      setUsuarios([]);
     }
   }, []);
 
   const fetchRoles = useCallback(async () => {
     setErrorApi(null);
     try {
-      // CORRECCIÓN: Apuntar al endpoint correcto del backend (`/roles/`)
       const response = await apiClient.get("/roles/");
       setRoles(response.data || []);
     } catch (err) {
       console.error("Error al cargar roles:", err);
       setErrorApi(`No se pudieron cargar los roles: ${err.response?.data?.detail || err.message}.`);
-      setRoles([]); // Asegurar que el estado es un array vacío en caso de error
+      setRoles([]);
     }
   }, []);
 
+  //---------------------------------------------
+  // EFECTO PARA CARGAR DATOS INICIALES
+  //---------------------------------------------
   useEffect(() => {
     fetchRoles();
     fetchUsuarios();
   }, [fetchUsuarios, fetchRoles]);
 
-  // MEJORA: Funciones de CRUD refactorizadas con Axios
+  //---------------------------------------------
+  // FUNCIONES CRUD (CREAR, ACTUALIZAR, ELIMINAR)
+  //---------------------------------------------
   const handleCrearUsuario = async () => {
     if (!formulario.nombre || !formulario.correo_electronico || !formulario.cedula || !formulario.password || !formulario.id_rol) {
       alert("Por favor, complete todos los campos requeridos.");
@@ -82,7 +99,6 @@ const Usuarios = () => {
     const datosParaEnviar = { ...formulario, id_rol: parseInt(formulario.id_rol, 10) };
     setErrorApi(null);
     try {
-      // CORRECCIÓN: Apuntar al endpoint correcto del backend (`/usuarios/`)
       await apiClient.post("/usuarios/", datosParaEnviar);
       alert("Usuario creado exitosamente");
       cerrarModalYLimpiar();
@@ -96,11 +112,10 @@ const Usuarios = () => {
   const handleActualizarUsuario = async () => {
     const datosParaEnviar = { ...formulario, id_rol: parseInt(formulario.id_rol, 10) };
     if (!datosParaEnviar.password) {
-      delete datosParaEnviar.password;
+      delete datosParaEnviar.password; // No se envía la contraseña si está vacía
     }
     setErrorApi(null);
     try {
-      // CORRECCIÓN: Apuntar al endpoint correcto del backend (`/usuarios/{id}`)
       await apiClient.put(`/usuarios/${usuarioEditandoId}`, datosParaEnviar);
       alert("Usuario actualizado exitosamente");
       cerrarModalYLimpiar();
@@ -115,7 +130,6 @@ const Usuarios = () => {
     if (!window.confirm("¿Está seguro de que desea eliminar este usuario?")) return;
     setErrorApi(null);
     try {
-      // CORRECCIÓN: Apuntar al endpoint correcto del backend (`/usuarios/{id}`)
       await apiClient.delete(`/usuarios/${idUsuario}`);
       alert("Usuario eliminado exitosamente.");
       fetchUsuarios();
@@ -125,6 +139,9 @@ const Usuarios = () => {
     }
   };
 
+  //---------------------------------------------
+  // MANEJADORES DE FORMULARIO Y MODAL
+  //---------------------------------------------
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormulario({ ...formulario, [name]: value });
@@ -141,15 +158,14 @@ const Usuarios = () => {
     setErrorApi(null);
   };
 
-  // CORRECCIÓN: La data del usuario es un OBJETO, no un array.
   const handleEditarUsuario = (usuario) => {
     setFormulario({
       nombre: usuario.nombre,
       correo_electronico: usuario.correo_electronico,
       telefono: usuario.telefono,
       cedula: usuario.cedula,
-      password: "", // No pre-rellenar la contraseña
-      id_rol: usuario.id_rol, // El ID del rol ya viene en el objeto usuario
+      password: "", // No pre-rellenar la contraseña por seguridad
+      id_rol: usuario.id_rol,
     });
     setUsuarioEditandoId(usuario.id_usuario);
     setEditando(true);
@@ -165,11 +181,16 @@ const Usuarios = () => {
     setErrorApi(null);
   };
 
-  // CORRECCIÓN: Filtrar por `u.nombre` que es una propiedad del objeto
+  //---------------------------------------------
+  // LÓGICA DE FILTRADO
+  //---------------------------------------------
   const usuariosFiltrados = usuarios.filter((u) =>
     u.nombre && u.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
+  //---------------------------------------------
+  // RENDERIZADO DEL COMPONENTE
+  //---------------------------------------------
   return (
     <div className="d-flex main-layout-container">
       <Sidebar />
@@ -181,6 +202,7 @@ const Usuarios = () => {
               Crear Usuario
             </button>
           </div>
+          {/* Barra de búsqueda */}
           <div className="mb-4">
             <input
               type="text"
@@ -190,7 +212,9 @@ const Usuarios = () => {
               onChange={(e) => setBusqueda(e.target.value)}
             />
           </div>
+          {/* Alerta de error */}
           {errorApi && <div className="alert alert-danger">{errorApi}</div>}
+          {/* Tabla de usuarios */}
           <div className="table-responsive">
             <table className="table table-hover usuarios-table">
               <thead>
@@ -204,8 +228,6 @@ const Usuarios = () => {
                 </tr>
               </thead>
               <tbody>
-                {/* CORRECCIÓN: El usuario `u` es un objeto. Se accede a sus propiedades (ej. u.nombre) */}
-                {/* y se usa `u.id_usuario` como `key` única. */}
                 {usuariosFiltrados.length > 0 ? (
                   usuariosFiltrados.map((u) => (
                     <tr key={u.id_usuario}>
@@ -232,6 +254,9 @@ const Usuarios = () => {
               </tbody>
             </table>
           </div>
+          {/*---------------------------------------------*/}
+          {/* MODAL PARA CREAR/EDITAR USUARIOS */}
+          {/*---------------------------------------------*/}
           {modalVisible && (
             <div className="modal-overlay_User">
               <div className="modal-container_User">

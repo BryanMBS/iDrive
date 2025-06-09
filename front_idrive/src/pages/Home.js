@@ -1,3 +1,5 @@
+// Home.js
+
 import { Button, Container, Row, Col, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import NavigationBar from "../components/Navbar";
@@ -5,6 +7,9 @@ import Footer from "../components/Footer";
 import "./Home.css";
 import { FaCalendarAlt, FaTasks, FaUserCheck, FaFileAlt } from "react-icons/fa";
 
+//---------------------------------------------
+// COMPONENTE PRINCIPAL DE LA PÁGINA DE INICIO
+//---------------------------------------------
 const Home = () => {
   const navigate = useNavigate();
 
@@ -12,7 +17,9 @@ const Home = () => {
     <div className="_HM_home-page">
       <NavigationBar />
       <main className="_HM_home-content">
-        {/* SECCIÓN 1: HERO */}
+        {/*---------------------------------------------*/}
+        {/* SECCIÓN 1: HERO - INTRODUCCIÓN PRINCIPAL */}
+        {/*---------------------------------------------*/}
         <header className="_HM_hero-section text-center text-white">
           <Container>
             <h1 className="_HM_hero-title">La gestión de clases teóricas, ahora más simple que nunca.</h1>
@@ -25,13 +32,16 @@ const Home = () => {
           </Container>
         </header>
 
+        {/*---------------------------------------------*/}
         {/* SECCIÓN 2: CARACTERÍSTICAS */}
+        {/*---------------------------------------------*/}
         <section id="features" className="_HM_features-section py-5">
           <Container>
             <div className="text-center mb-5">
               <h2 className="_HM_section-title">Todo lo que necesitas en un solo lugar</h2>
             </div>
             <Row>
+              {/* Tarjeta de Característica: Calendario */}
               <Col md={6} lg={3} className="mb-4 d-flex">
                 <Card className="_HM_feature-card text-center w-100">
                   <Card.Body>
@@ -43,6 +53,7 @@ const Home = () => {
                   </Card.Body>
                 </Card>
               </Col>
+              {/* Tarjeta de Característica: Seguimiento */}
               <Col md={6} lg={3} className="mb-4 d-flex">
                 <Card className="_HM_feature-card text-center w-100">
                   <Card.Body>
@@ -54,6 +65,7 @@ const Home = () => {
                   </Card.Body>
                 </Card>
               </Col>
+              {/* Tarjeta de Característica: Documentos */}
               <Col md={6} lg={3} className="mb-4 d-flex">
                 <Card className="_HM_feature-card text-center w-100">
                   <Card.Body>
@@ -65,6 +77,7 @@ const Home = () => {
                   </Card.Body>
                 </Card>
               </Col>
+              {/* Tarjeta de Característica: Perfiles */}
               <Col md={6} lg={3} className="mb-4 d-flex">
                 <Card className="_HM_feature-card text-center w-100">
                   <Card.Body>
@@ -80,7 +93,9 @@ const Home = () => {
           </Container>
         </section>
 
+        {/*---------------------------------------------*/}
         {/* SECCIÓN 3: CÓMO FUNCIONA */}
+        {/*---------------------------------------------*/}
         <section className="_HM_how-it-works-section py-5">
             <Container>
                 <Row className="align-items-center">
@@ -106,7 +121,9 @@ const Home = () => {
             </Container>
         </section>
         
-        {/* El botón ya redirige a /contact */}
+        {/*---------------------------------------------*/}
+        {/* SECCIÓN 4: LLAMADA A LA ACCIÓN FINAL (CTA) */}
+        {/*---------------------------------------------*/}
         <section id="contact" className="_HM_final-cta-section text-center text-white py-5">
             <Container>
                 <h2 className="_HM_hero-title">¿Listo para llevar tu escuela al siguiente nivel?</h2>

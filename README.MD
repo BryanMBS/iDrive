@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <div align="center">
-  <img src="front_idrive/src/assets/Logo_iDrive.jpg" alt="logo" width="250" height="250" />
+  <img src="front_idrive/src/assets/Logo_iDrive.png" alt="logo" width="250" height="250" />
   <br/>
   <h3><b>IDRIVE - Sistema de Gestión de Usuarios</b></h3>
 </div>

@@ -1,14 +1,19 @@
+// Clases.js
+
 import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import axios from 'axios';
 import "./Usuarios.css"; // Reutilizamos los estilos para consistencia
 
-// Configuración de Axios
+//---------------------------------------------
+// CONFIGURACIÓN DE AXIOS
+//---------------------------------------------
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const apiClient = axios.create({
   baseURL: API_URL,
 });
 
+// Interceptor para añadir el token de autenticación a las peticiones
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -17,7 +22,9 @@ apiClient.interceptors.request.use(config => {
   return config;
 });
 
-// --- CAMBIO: Nueva lista de clases teóricas detallada por módulos ---
+//---------------------------------------------
+// DATOS PREDEFINIDOS
+//---------------------------------------------
 const CLASES_TEORICAS_PREDEFINIDAS = [
     // Clase 1 en dos módulos
     { nombre: 'Normatividad de Tránsito (Módulo 1)', descripcion: 'Conocimiento del Código Nacional de Tránsito (Ley 769 de 2002).' },
@@ -39,8 +46,13 @@ const CLASES_TEORICAS_PREDEFINIDAS = [
     { nombre: 'Sistema Integrado de Transporte', descripcion: 'Funcionamiento del transporte público/privado y rol del conductor en la movilidad.' },
 ];
 
-
+//---------------------------------------------
+// COMPONENTE PRINCIPAL DE CLASES
+//---------------------------------------------
 const Clases = () => {
+    //---------------------------------------------
+    // ESTADOS DEL COMPONENTE
+    //---------------------------------------------
     const [clases, setClases] = useState([]);
     const [profesores, setProfesores] = useState([]);
     const [salones, setSalones] = useState([]);
@@ -59,6 +71,9 @@ const Clases = () => {
         duracion_minutos: "60",
     });
 
+    //---------------------------------------------
+    // FUNCIONES PARA OBTENER DATOS DE LA API
+    //---------------------------------------------
     const fetchClases = useCallback(async () => {
         try {
             const response = await apiClient.get("/clases/");
@@ -93,12 +108,18 @@ const Clases = () => {
         }
     }, []);
 
+    //---------------------------------------------
+    // EFECTO PARA CARGAR DATOS INICIALES
+    //---------------------------------------------
     useEffect(() => {
         fetchClases();
         fetchProfesores();
         fetchSalones();
     }, [fetchClases, fetchProfesores, fetchSalones]);
 
+    //---------------------------------------------
+    // FUNCIONES CRUD (CREAR, ACTUALIZAR, ELIMINAR)
+    //---------------------------------------------
     const handleCrearClase = async () => {
         const datosParaEnviar = {
             ...formulario,
@@ -146,6 +167,9 @@ const Clases = () => {
         }
     };
     
+    //---------------------------------------------
+    // MANEJADORES DE FORMULARIO Y MODAL
+    //---------------------------------------------
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormulario({ ...formulario, [name]: value });
@@ -195,6 +219,9 @@ const Clases = () => {
         resetFormulario();
     };
 
+    //---------------------------------------------
+    // FUNCIONES AUXILIARES DE RENDERIZADO
+    //---------------------------------------------
     const getProfesorNombre = useCallback((id) => {
         const profesor = profesores.find(p => p.id_usuario === id);
         return profesor ? profesor.nombre : 'N/A';
@@ -205,6 +232,9 @@ const Clases = () => {
         return salon ? salon.nombre_salon : 'N/A';
     }, [salones]);
 
+    //---------------------------------------------
+    // RENDERIZADO DEL COMPONENTE
+    //---------------------------------------------
     return (
         <div className="d-flex main-layout-container">
             <Sidebar />
@@ -256,6 +286,9 @@ const Clases = () => {
                             </tbody>
                         </table>
                     </div>
+                    {/*---------------------------------------------*/}
+                    {/* MODAL PARA CREAR/EDITAR CLASES */}
+                    {/*---------------------------------------------*/}
                     {modalVisible && (
                         <div className="modal-overlay_User">
                             <div className="modal-container_User">

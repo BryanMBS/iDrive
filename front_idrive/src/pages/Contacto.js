@@ -1,13 +1,20 @@
-// src/pages/Contact.js
+// Contacto.js
 
 import { useState } from 'react';
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import NavigationBar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "./Contacto.css"; // Crearemos este archivo a continuación
+import "./Contacto.css";
 import { FaMapMarkerAlt, FaPhone, FaEnvelope } from "react-icons/fa";
 
+//---------------------------------------------
+// COMPONENTE PRINCIPAL DE CONTACTO
+//---------------------------------------------
+
 const Contact = () => {
+    //---------------------------------------------
+    // ESTADO DEL FORMULARIO
+    //---------------------------------------------
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -15,19 +22,28 @@ const Contact = () => {
         message: ''
     });
 
+    //---------------------------------------------
+    // MANEJADORES DE EVENTOS
+    //---------------------------------------------
+
+    // Actualiza el estado del formulario cuando el usuario escribe en los inputs
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
+    // Procesa el envío del formulario
     const handleSubmit = (e) => {
         e.preventDefault();
-        // En una aplicación real, aquí enviarías los datos a un backend o a un servicio de email.
+        // En una aplicación real, aquí se enviarían los datos a un backend.
         alert(`Gracias por tu mensaje, ${formData.name}. Nos pondremos en contacto contigo pronto.`);
-        // Limpiar el formulario
+        // Limpia el formulario después del envío
         setFormData({ name: '', email: '', subject: '', message: '' });
     };
 
+    //---------------------------------------------
+    // RENDERIZADO DEL COMPONENTE
+    //---------------------------------------------
     return (
         <div className="_CT_contact-page">
             <NavigationBar />
@@ -38,7 +54,9 @@ const Contact = () => {
                         <p className="lead text-muted">Estamos aquí para ayudarte. Completa el formulario o utiliza nuestros datos de contacto.</p>
                     </div>
                     <Row>
-                        {/* Columna Izquierda: Formulario */}
+                        {/*---------------------------------------------*/}
+                        {/* COLUMNA IZQUIERDA: FORMULARIO DE CONTACTO */}
+                        {/*---------------------------------------------*/}
                         <Col lg={7} className="mb-5 mb-lg-0">
                             <Card className="_CT_contact-card">
                                 <Card.Body>
@@ -68,7 +86,9 @@ const Contact = () => {
                             </Card>
                         </Col>
 
-                        {/* Columna Derecha: Información y Mapa */}
+                        {/*---------------------------------------------*/}
+                        {/* COLUMNA DERECHA: INFORMACIÓN Y MAPA */}
+                        {/*---------------------------------------------*/}
                         <Col lg={5}>
                             <Card className="_CT_contact-card">
                                 <Card.Body>

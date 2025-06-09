@@ -1,3 +1,5 @@
+// Agendamientos.js
+
 import React, { useState, useEffect, useCallback } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -6,12 +8,16 @@ import axios from "axios";
 import "./Agendamientos.css";
 import Sidebar from "../components/Sidebar";
 
-// Configuración de Axios
+//---------------------------------------------
+// CONFIGURACIÓN DE AXIOS
+//---------------------------------------------
+
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const apiClient = axios.create({
   baseURL: API_URL,
 });
 
+// Interceptor para añadir el token de autenticación a las peticiones
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -20,7 +26,14 @@ apiClient.interceptors.request.use(config => {
   return config;
 });
 
+//---------------------------------------------
+// COMPONENTE PRINCIPAL DE AGENDAMIENTOS
+//---------------------------------------------
+
 const Agendamientos = () => {
+  //---------------------------------------------
+  // ESTADOS DEL COMPONENTE
+  //---------------------------------------------
   const [clases, setClases] = useState([]);
   const [agendamientos, setAgendamientos] = useState([]);
   const [showAgendarModal, setShowAgendarModal] = useState(false);
@@ -31,6 +44,11 @@ const Agendamientos = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [formularioAgendamiento, setFormularioAgendamiento] = useState({ cedula: "", id_clase: "" });
 
+  //---------------------------------------------
+  // FUNCIONES PARA OBTENER DATOS DE LA API
+  //---------------------------------------------
+
+  // Obtiene todas las clases disponibles
   const fetchClases = useCallback(async () => {
     try {
       const response = await apiClient.get("/clases/");
@@ -40,6 +58,7 @@ const Agendamientos = () => {
     }
   }, []);
 
+  // Obtiene todos los agendamientos existentes
   const fetchAgendamientos = useCallback(async () => {
     try {
       const response = await apiClient.get("/agendamientos/");
@@ -51,15 +70,24 @@ const Agendamientos = () => {
     }
   }, []);
 
+  // Carga los datos iniciales (clases y agendamientos)
   const loadInitialData = useCallback(async () => {
     await fetchClases();
     await fetchAgendamientos();
   }, [fetchClases, fetchAgendamientos]);
 
+  //---------------------------------------------
+  // EFECTO PARA CARGAR DATOS INICIALES
+  //---------------------------------------------
+
   useEffect(() => {
     loadInitialData();
   }, [loadInitialData]);
   
+  //---------------------------------------------
+  // PROCESAMIENTO DE EVENTOS PARA EL CALENDARIO
+  //---------------------------------------------
+
   const eventos = clases.map((clase) => {
     const registrados = agendamientos.filter(a => a.id_clase === clase.id_clase).length;
     const cuposDisponibles = clase.cupos_disponibles;
@@ -78,6 +106,11 @@ const Agendamientos = () => {
     };
   });
 
+  //---------------------------------------------
+  // MANEJADORES DE ACCIONES DEL USUARIO
+  //---------------------------------------------
+
+  // Envía la solicitud para agendar una nueva clase
   const handleAgendarClase = async () => {
     if (!formularioAgendamiento.cedula || !formularioAgendamiento.id_clase) {
       alert("Por favor, completa todos los campos para agendar.");
@@ -94,11 +127,13 @@ const Agendamientos = () => {
     }
   };
   
+  // Muestra el detalle de un evento al hacer clic en él
   const handleEventClick = (clickInfo) => {
     setSelectedEvent(clickInfo.event.extendedProps);
     setShowEventDetailModal(true);
   };
   
+  // Muestra las clases de un día específico al hacer clic en una fecha
   const handleDateClick = (info) => {
     const clickedDate = info.dateStr;
     setSelectedDate(clickedDate);
@@ -108,6 +143,10 @@ const Agendamientos = () => {
     setSelectedDayClasses(classesForDay);
     setShowDayClassesModal(true);
   };
+  
+  //---------------------------------------------
+  // RENDERIZADO DEL COMPONENTE
+  //---------------------------------------------
   
   return (
     <div className="d-flex">
@@ -127,7 +166,7 @@ const Agendamientos = () => {
             headerToolbar={{
               left: "prev,next today",
               center: "title",
-              right: "" // <-- CAMBIO: Botones de Mes/Semana/Día eliminados
+              right: "" 
             }}
             buttonText={{
               today: "Hoy"
@@ -145,7 +184,11 @@ const Agendamientos = () => {
         </div>
       </div>
 
-      {/* --- Modales (sin cambios en su estructura interna) --- */}
+      {/*---------------------------------------------*/}
+      {/* MODALES */}
+      {/*---------------------------------------------*/}
+
+      {/* Modal para Agendar una Nueva Clase */}
       {showAgendarModal && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -179,6 +222,7 @@ const Agendamientos = () => {
         </div>
       )}
 
+      {/* Modal para ver Detalles del Evento */}
       {showEventDetailModal && selectedEvent && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -194,6 +238,7 @@ const Agendamientos = () => {
         </div>
       )}
       
+      {/* Modal para ver Clases del Día */}
       {showDayClassesModal && (
         <div className="modal-overlay">
           <div className="modal-container">

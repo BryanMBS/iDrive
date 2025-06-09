@@ -1,18 +1,27 @@
+// Dashboard.js
+
 import React from 'react';
 import Sidebar from '../components/Sidebar';
-import './Dashboard.css'; // Mantenemos el CSS específico del Dashboard para las tarjetas
-import './Usuarios.css'; // IMPORTANTE: Añadimos la importación del CSS de Usuarios para el layout
+import './Dashboard.css'; 
+import './Usuarios.css'; 
+
+//---------------------------------------------
+// COMPONENTE PRINCIPAL DEL DASHBOARD
+//---------------------------------------------
 
 const Dashboard = () => {
   return (
-    // 1. Usamos la misma estructura de contenedor que en Usuarios.js
+    // Estructura principal del layout con Flexbox
     <div className="d-flex main-layout-container">
       <Sidebar />
-      {/* 2. Usamos la clase que aplica el margen izquierdo de 250px */}
+      {/* Contenedor del área de contenido principal */}
       <div className="content-area_User">
         <div id="content">
           <div className="container-fluid py-4">
-            {/* */}
+            
+            {/*---------------------------------------------*/}
+            {/* CABECERA DEL DASHBOARD */}
+            {/*---------------------------------------------*/}
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
               <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
               <a href="#" className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
@@ -20,9 +29,11 @@ const Dashboard = () => {
               </a>
             </div>
 
-            {/* */}
+            {/*---------------------------------------------*/}
+            {/* FILA DE TARJETAS DE ESTADÍSTICAS */}
+            {/*---------------------------------------------*/}
             <div className="row">
-              {/* */}
+              {/* Tarjeta: Clases Programadas */}
               <div className="col-xl-3 col-md-6 mb-4">
                 <div className="card-dashboard border-left-primary shadow h-100 py-2">
                   <div className="card-body">
@@ -41,7 +52,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* */}
+              {/* Tarjeta: Nuevos Usuarios */}
               <div className="col-xl-3 col-md-6 mb-4">
                 <div className="card-dashboard border-left-success shadow h-100 py-2">
                   <div className="card-body">
@@ -60,7 +71,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* */}
+              {/* Tarjeta: Tasa de Ocupación con Barra de Progreso */}
               <div className="col-xl-3 col-md-6 mb-4">
                 <div className="card-dashboard border-left-info shadow h-100 py-2">
                   <div className="card-body">
@@ -95,7 +106,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* */}
+              {/* Tarjeta: Alertas Pendientes */}
               <div className="col-xl-3 col-md-6 mb-4">
                 <div className="card-dashboard border-left-warning shadow h-100 py-2">
                   <div className="card-body">
@@ -115,7 +126,9 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* */}
+            {/*---------------------------------------------*/}
+            {/* SECCIÓN DE BIENVENIDA */}
+            {/*---------------------------------------------*/}
             <div className="row">
               <div className="col-lg-12 mb-4">
                 <div className="card-dashboard shadow mb-4">
