@@ -12,6 +12,9 @@ import Usuarios from "./pages/Usuarios";
 import Clases from "./pages/Clases";
 import Contacto from "./pages/Contacto";
 import MisClases from "./pages/MisClases"; 
+import CambiarPassword from "./pages/CambiarPassword";
+import SolicitarReseteo from './pages/SolicitarReseteo';
+import ResetearPassword from './pages/ResetearPassword';
 
 // Estilos
 import "./assets/css/sb-admin-2.min.css";
@@ -29,6 +32,9 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/contacto" element={<Contacto />} />
+                    <Route path="/cambiar-password" element={<CambiarPassword />} />
+                    <Route path="/solicitar-reseteo" element={<SolicitarReseteo />} />
+                    <Route path="/reseteo-password/:token" element={<ResetearPassword />} />
 
                     {/* Rutas del Panel de Administración */}
                     <Route path="/dashboard" element={<Dashboard />} />

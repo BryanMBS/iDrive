@@ -1,0 +1,145 @@
+/* src/pages/AuthForm.css */
+/* Estilos modernos y de marca para todos los formularios de autenticación */
+
+/* Importamos la paleta de colores de Home para consistencia */
+@import url('./Home.css'); 
+
+/* --- Contenedor Principal del Layout --- */
+._AF_auth-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- Panel Izquierdo (Branding) --- */
+._AF_brand-panel {
+    width: 45%;
+    background: linear-gradient(135deg, #2c3e50, #465a70); /* Gradiente con tu azul oscuro */
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+._AF_brand-logo {
+    display: flex;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color); /* Azul brillante para el logo */
+    margin-bottom: 1rem;
+}
+
+._AF_brand-logo i {
+    margin-right: 1rem;
+}
+
+._AF_brand-panel h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+._AF_brand-panel p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 350px;
+}
+
+/* --- Panel Derecho (Formulario) --- */
+._AF_form-container {
+    width: 55%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    background-color: #f8f9fa;
+}
+
+._AF_card {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 450px;
+}
+
+._AF_card h2 {
+    font-weight: 600;
+    color: var(--dark-bg);
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+._AF_card ._AF_subtitle {
+    margin-bottom: 2rem;
+    color: #6c757d;
+    text-align: center;
+}
+
+._AF_input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+._AF_input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(0, 171, 228, 0.25);
+    outline: none;
+}
+
+._AF_button {
+    width: 100%;
+    padding: 0.85rem;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+._AF_button:hover {
+    background-color: var(--primary-color-hover);
+}
+
+._AF_error {
+    color: #dc3545;
+    margin-top: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+._AF_link {
+    display: block;
+    margin-top: 1.5rem;
+    text-align: center;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+._AF_link:hover {
+    text-decoration: underline;
+}
+
+/* --- Diseño Responsivo --- */
+@media (max-width: 992px) {
+    ._AF_brand-panel {
+        display: none; /* Ocultamos el panel de marca en tablets y móviles */
+    }
+
+    ._AF_form-container {
+        width: 100%;
+    }
+}

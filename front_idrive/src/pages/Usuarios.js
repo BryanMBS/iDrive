@@ -5,7 +5,7 @@ import Sidebar from "../components/Sidebar";
 import axios from 'axios';
 import "./Usuarios.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useAuth } from '../context/AuthContext'; // Importamos el hook de autenticación
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const apiClient = axios.create({ baseURL: API_URL });
@@ -14,12 +14,10 @@ apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
-}, error => Promise.reject(error));
-
+});
 
 const Usuarios = () => {
-  const { hasPermission } = useAuth(); // Obtenemos la función para verificar permisos
-
+  const { hasPermission } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -27,14 +25,15 @@ const Usuarios = () => {
   const [usuarioEditandoId, setUsuarioEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [errorApi, setErrorApi] = useState(null);
+
+  // CAMBIO: Se elimina 'password' del estado inicial del formulario
   const [formulario, setFormulario] = useState({
-    nombre: "", correo_electronico: "", telefono: "", cedula: "", password: "", id_rol: "",
+    nombre: "", correo_electronico: "", telefono: "", cedula: "", id_rol: "",
   });
 
   const fetchUsuarios = useCallback(async () => {
     setErrorApi(null);
     try {
-      // CORRECCIÓN: Endpoint en minúsculas
       const response = await apiClient.get("/usuarios/");
       setUsuarios(response.data || []);
     } catch (err) {
@@ -47,7 +46,6 @@ const Usuarios = () => {
   const fetchRoles = useCallback(async () => {
     setErrorApi(null);
     try {
-      // CORRECCIÓN: Endpoint en minúsculas
       const response = await apiClient.get("/roles/");
       setRoles(response.data || []);
     } catch (err) {
@@ -63,12 +61,20 @@ const Usuarios = () => {
   }, [fetchUsuarios, fetchRoles]);
 
   const handleCrearUsuario = async () => {
-    // ... (validaciones)
-    const datosParaEnviar = { ...formulario, id_rol: parseInt(formulario.id_rol, 10) };
+    // CAMBIO: Se ajusta el payload para que no incluya la contraseña
+    const { password, ...datosParaEnviar } = formulario;
+    if (!datosParaEnviar.nombre || !datosParaEnviar.correo_electronico || !datosParaEnviar.cedula || !datosParaEnviar.id_rol) {
+      alert("Por favor, complete todos los campos requeridos.");
+      return;
+    }
+
     try {
-      // CORRECCIÓN: Endpoint en minúsculas
-      await apiClient.post("/usuarios/", datosParaEnviar);
-      alert("Usuario creado exitosamente");
+      // El backend ahora es 'UsuarioCreateAdmin' que no espera contraseña
+      const response = await apiClient.post("/usuarios/", datosParaEnviar);
+      
+      // CAMBIO: Se muestra la contraseña temporal devuelta por el backend
+      alert(`Usuario creado con éxito.\n\nContraseña Temporal: ${response.data.password_temporal}\n\nPor favor, entrégala al nuevo usuario para su primer inicio de sesión.`);
+      
       cerrarModalYLimpiar();
       fetchUsuarios();
     } catch (err) {
@@ -78,9 +84,10 @@ const Usuarios = () => {
 
   const handleActualizarUsuario = async () => {
     const datosParaEnviar = { ...formulario, id_rol: parseInt(formulario.id_rol, 10) };
-    if (!datosParaEnviar.password) delete datosParaEnviar.password;
+    if (!datosParaEnviar.password) {
+      delete datosParaEnviar.password;
+    }
     try {
-      // CORRECCIÓN: Endpoint en minúsculas
       await apiClient.put(`/usuarios/${usuarioEditandoId}`, datosParaEnviar);
       alert("Usuario actualizado exitosamente");
       cerrarModalYLimpiar();
@@ -93,7 +100,6 @@ const Usuarios = () => {
   const handleEliminarUsuario = async (idUsuario) => {
     if (!window.confirm("¿Está seguro de que desea eliminar este usuario?")) return;
     try {
-      // CORRECCIÓN: Endpoint en minúsculas
       await apiClient.delete(`/usuarios/${idUsuario}`);
       alert("Usuario eliminado exitosamente.");
       fetchUsuarios();
@@ -107,7 +113,8 @@ const Usuarios = () => {
   };
 
   const resetFormulario = () => {
-    setFormulario({ nombre: "", correo_electronico: "", telefono: "", cedula: "", password: "", id_rol: "" });
+    // CAMBIO: El reseteo del formulario ya no incluye el campo password
+    setFormulario({ nombre: "", correo_electronico: "", telefono: "", cedula: "", id_rol: "" });
   };
 
   const abrirModalParaCrear = () => {
@@ -117,13 +124,12 @@ const Usuarios = () => {
   };
 
   const handleEditarUsuario = (usuario) => {
-    // CORRECCIÓN: Accedemos a las propiedades del objeto usuario
     setFormulario({
       nombre: usuario.nombre,
       correo_electronico: usuario.correo_electronico,
       telefono: usuario.telefono,
       cedula: usuario.cedula,
-      password: "",
+      password: "", // El campo se deja vacío para la edición
       id_rol: usuario.id_rol,
     });
     setUsuarioEditandoId(usuario.id_usuario);
@@ -138,7 +144,6 @@ const Usuarios = () => {
     resetFormulario();
   };
 
-  // CORRECCIÓN: Filtramos usando la propiedad 'nombre' del objeto
   const usuariosFiltrados = usuarios.filter((u) =>
     u.nombre && u.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -165,13 +170,12 @@ const Usuarios = () => {
             <table className="table table-hover usuarios-table">
               <thead>
                 <tr>
-                  <th>Nombre</th> <th>Correo</th> <th>Teléfono</th> <th>Cédula</th> <th>Rol</th> <th>Acciones</th>
+                  <th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Cédula</th><th>Rol</th><th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {usuariosFiltrados.length > 0 ? (
                   usuariosFiltrados.map((u) => (
-                    // CORRECCIÓN: Usamos propiedades del objeto para los datos y la key
                     <tr key={u.id_usuario}>
                       <td>{u.nombre}</td>
                       <td>{u.correo_electronico}</td>
@@ -204,7 +208,12 @@ const Usuarios = () => {
                 <input type="email" name="correo_electronico" placeholder="Correo" value={formulario.correo_electronico} onChange={handleInputChange} className="modal-input_User" />
                 <input type="text" name="telefono" placeholder="Teléfono" value={formulario.telefono} onChange={handleInputChange} className="modal-input_User" />
                 <input type="text" name="cedula" placeholder="Cédula" value={formulario.cedula} onChange={handleInputChange} className="modal-input_User" />
-                <input type="password" name="password" placeholder={editando ? "Nueva contraseña (opcional)" : "Contraseña"} value={formulario.password} onChange={handleInputChange} className="modal-input_User" />
+                
+                {/* CAMBIO: El campo de contraseña solo aparece si se está editando un usuario */}
+                {editando && (
+                  <input type="password" name="password" placeholder="Nueva contraseña (opcional)" onChange={handleInputChange} className="modal-input_User" />
+                )}
+                
                 <select name="id_rol" value={formulario.id_rol} onChange={handleInputChange} className="modal-select_User">
                   <option value="">Seleccione un rol</option>
                   {roles.map((rol) => (<option key={rol.id_rol} value={rol.id_rol}>{rol.nombre_rol}</option>))}

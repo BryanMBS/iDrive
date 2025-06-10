@@ -327,4 +327,12 @@ INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
 (3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:calendario')),
 (2, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:calendario'));
 
+-- Agregar columna para indicar si el usuario requiere cambiar la contraseña al primer inicio de sesión
+
+ALTER TABLE `Usuarios`
+ADD COLUMN `requiere_cambio_password` BOOLEAN NOT NULL DEFAULT TRUE AFTER `estado`;
+
+ADD COLUMN `password_reset_token` VARCHAR(255) NULL DEFAULT NULL AFTER `requiere_cambio_password`,
+ADD COLUMN `reset_token_expires` DATETIME NULL DEFAULT NULL AFTER `password_reset_token`;
+
 COMMIT;

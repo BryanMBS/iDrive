@@ -12,8 +12,13 @@ class UsuarioBase(BaseModel):
     cedula: str = Field(..., max_length=20)
     id_rol: int = Field(..., ge=1)
 
-class UsuarioCreate(UsuarioBase):
-    password: str = Field(..., min_length=8)
+# CAMBIO: El modelo para crear un usuario ya no necesita la contraseña
+class UsuarioCreateAdmin(BaseModel):
+    nombre: str
+    correo_electronico: EmailStr
+    telefono: str
+    cedula: str
+    id_rol: int
 
 class UsuarioUpdate(BaseModel):
     nombre: Optional[str] = Field(None, max_length=100)
@@ -34,10 +39,11 @@ class UsuarioResponse(UsuarioBase):
     class Config:
         from_attributes = True
 
-# --- Esquemas para Autenticación ---
+# CAMBIO: La respuesta del login ahora incluye una bandera para el cambio de contraseña
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    requiere_cambio_password: bool
     id_usuario: int
     nombre: str
     id_rol: int
@@ -46,6 +52,23 @@ class LoginResponse(BaseModel):
 class TokenData(BaseModel):
     id_usuario: Optional[int] = None
     permisos: List[str] = []
+    
+# CAMBIO: Nuevo modelo para el endpoint de cambio de contraseña
+class PasswordChange(BaseModel):
+    new_password: str = Field(..., min_length=8)
+
+# CAMBIO: Modelo de respuesta para la creación de usuario, incluye la pass temporal
+class UserCreationResponse(UsuarioResponse):
+    password_temporal: str
+    
+# CAMBIO: Modelo para el endpoint de solicitud de reseteo de contraseña    
+class SolicitarReseteoRequest(BaseModel):
+    correo_electronico: EmailStr
+    
+# CAMBIO: Modelo para el endpoint de reseteo de contraseña
+class RealizarReseteoRequest(BaseModel):
+    token: str
+    new_password: str = Field(..., min_length=8)
 
 # --- Esquemas para Clases (Opcional, pero buena práctica tenerlos aquí) ---
 class ClaseCreate(BaseModel):
