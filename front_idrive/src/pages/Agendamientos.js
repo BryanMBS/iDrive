@@ -174,8 +174,10 @@ const Agendamientos = () => {
             height="auto"
             eventClick={handleEventClick}
             dateClick={handleDateClick}
-            headerToolbar={{ left: "prev,next today", center: "title", right: "" }}
-            buttonText={{ today: "Hoy" }}
+            // --- INICIO DE LA MODIFICACIÓN ---
+            headerToolbar={{ left: "prev,next today", center: "title", right: "dayGridMonth,dayGridWeek" }}
+            buttonText={{ today: "Hoy", month: "Mes", week: "Semana" }}
+            // --- FIN DE LA MODIFICACIÓN ---
           />
 
           <div className="agendamiento-botones">
