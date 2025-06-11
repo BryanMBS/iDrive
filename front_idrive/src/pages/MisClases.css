@@ -97,9 +97,9 @@
 }
 
 /* Colores para cada estado */
-._MC_estado-pendiente { background-color: #ffc107; color: #000; }
-._MC_estado-confirmado { background-color: #198754; }
-._MC_estado-cancelado { background-color: #dc3545; }
+._MC_estado-pendiente { background-color: #ffe084; color: #000; }
+._MC_estado-confirmado { background-color: #5dffb4; }
+._MC_estado-cancelado { background-color: #ff3e51; }
 
 ._MC_card-body {
     padding: 1.25rem;

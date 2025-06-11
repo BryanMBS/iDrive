@@ -94,22 +94,47 @@ def update_clase(id_clase: int, clase_data: ClaseUpdate, db_conn=Depends(get_db_
     "/{id_clase}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Eliminar una clase",
-    dependencies=[Depends(has_permission("clases:eliminar"))]  # <-- RUTA PROTEGIDA
+    dependencies=[Depends(has_permission("clases:eliminar"))]
 )
 def delete_clase(id_clase: int, db_conn=Depends(get_db_connection)):
     """
-    Elimina una clase existente.
-    Solo los usuarios con el permiso 'clases:eliminar' pueden acceder.
+    Elimina una clase existente por su ID.
+    Primero verifica que no tenga agendamientos asociados para mantener
+    la integridad de los datos.
     """
     try:
         cursor = db_conn.cursor()
-        cursor.execute("DELETE FROM Clases WHERE id_clase = %s", (id_clase,))
+
+        # --- CAMBIO: Verificación previa de agendamientos existentes ---
+        check_query = "SELECT COUNT(*) FROM Agendamientos WHERE id_clase = %s"
+        cursor.execute(check_query, (id_clase,))
+        agendamientos_count = cursor.fetchone()[0]
+
+        if agendamientos_count > 0:
+            # Si hay agendamientos, no se puede eliminar la clase.
+            logger.warning(f"Intento de eliminar la clase {id_clase} que tiene {agendamientos_count} agendamientos.")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, # 409 Conflict es un buen código para esta situación
+                detail=f"No se puede eliminar la clase porque tiene {agendamientos_count} estudiante(s) agendado(s). Por favor, cancele los agendamientos primero."
+            )
+        
+        # Si no hay agendamientos, procedemos a eliminar la clase
+        delete_query = "DELETE FROM Clases WHERE id_clase = %s"
+        cursor.execute(delete_query, (id_clase,))
         db_conn.commit()
+        
         if cursor.rowcount == 0:
+            # Esto ocurriría si la clase no existía desde el principio
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Clase no encontrada.")
+
+        logger.info(f"Clase eliminada con ID: {id_clase}")
         cursor.close()
+
     except mysql.connector.Error as err:
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error al eliminar clase.")
+        db_conn.rollback()
+        logger.error(f"Error de base de datos al eliminar clase: {err}")
+        # Se devuelve un error genérico si algo más falla
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error al consultar la base de datos.")
 
 
 # --- Endpoints Públicos (sin protección de permisos) ---

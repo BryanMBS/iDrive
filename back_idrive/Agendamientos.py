@@ -49,7 +49,8 @@ AGENDAMIENTO_DETALLE_QUERY = """
         c.nombre_clase, c.fecha_hora,
         prof.nombre AS profesor,
         s.nombre_salon,
-        est.nombre AS estudiante
+        est.nombre AS estudiante,
+        est.cedula -- <-- AÑADE ESTA LÍNEA
     FROM Agendamientos a
     JOIN Clases c ON a.id_clase = c.id_clase
     JOIN Usuarios prof ON c.id_profesor = prof.id_usuario

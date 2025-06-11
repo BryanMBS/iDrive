@@ -37,6 +37,9 @@ CREATE TABLE Usuarios (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ultimo_acceso TIMESTAMP NULL,
     estado ENUM('activo', 'inactivo') DEFAULT 'activo',
+    requiere_cambio_password BOOLEAN NOT NULL DEFAULT TRUE,
+    password_reset_token VARCHAR(255) NULL DEFAULT NULL,
+    reset_token_expires DATETIME NULL DEFAULT NULL,
     FOREIGN KEY (id_rol) REFERENCES Roles(id_rol)
 ) ENGINE=InnoDB;
 
@@ -122,6 +125,42 @@ CREATE TABLE ConfiguracionSistema (
   fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+-- -----------------------------------------------------
+-- Tabla `Permisos`
+-- Define cada acción individual que se puede realizar en el sistema.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Permisos` (
+  `id_permiso` INT NOT NULL AUTO_INCREMENT,
+  `nombre_permiso` VARCHAR(100) NOT NULL,
+  `descripcion` VARCHAR(255) NULL,
+  PRIMARY KEY (`id_permiso`),
+  UNIQUE INDEX `nombre_permiso_UNIQUE` (`nombre_permiso` ASC)
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla `Roles_Permisos`
+-- Tabla de unión que establece la relación Muchos-a-Muchos
+-- entre los Roles y los Permisos.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Roles_Permisos` (
+  `id_rol` INT NOT NULL,
+  `id_permiso` INT NOT NULL,
+  PRIMARY KEY (`id_rol`, `id_permiso`),
+  INDEX `fk_Roles_Permisos_Permisos_idx` (`id_permiso` ASC),
+  INDEX `fk_Roles_Permisos_Roles_idx` (`id_rol` ASC),
+  CONSTRAINT `fk_Roles_Permisos_Roles`
+    FOREIGN KEY (`id_rol`)
+    REFERENCES `Roles` (`id_rol`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Roles_Permisos_Permisos`
+    FOREIGN KEY (`id_permiso`)
+    REFERENCES `Permisos` (`id_permiso`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 -- =============================================
 -- 2. ÍNDICES PARA OPTIMIZACIÓN DE CONSULTAS
 -- =============================================
@@ -136,7 +175,7 @@ CREATE INDEX idx_notificaciones_usuario ON Notificaciones(id_usuario, leida);
 
 -- Vista para monitorear el estado de los cupos y reservas de las clases
 CREATE VIEW vista_cupos_clases AS
-SELECT 
+SELECT
     c.id_clase,
     c.nombre_clase,
     c.fecha_hora,
@@ -164,7 +203,7 @@ BEGIN
     SELECT cupos_disponibles INTO cupos
     FROM Clases
     WHERE id_clase = NEW.id_clase;
-    
+
     IF cupos <= 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No hay cupos disponibles para esta clase.';
@@ -229,29 +268,16 @@ INSERT INTO Roles (nombre_rol) VALUES ('Estudiante'), ('Profesor'), ('Administra
 -- Salones
 INSERT INTO Salones (nombre_salon, ubicacion, aforo, equipamiento) VALUES
 ('S201', 'Edificio Principal - Piso 2', 30, 'Proyector, Aire Acondicionado'),
-('S101', 'Edificio Secundario - Piso 1', 25, 'Pizarra Interactiva'),
+('S101', 'Edificio Secundario - Piso 1', 25, 'Pizarra Interactiva');
 
 -- Usuarios (Contraseñas y salts son de ejemplo, deben ser generados de forma segura)
 INSERT INTO Usuarios (nombre, correo_electronico, telefono, cedula, password_hash, salt, id_rol) VALUES
 ('Carlos Acosta', 'carlos.acosta@email.com', '3101112233', '1020304050', 'hash_ejemplo_1', 'salt_ejemplo_1', 1),
 ('Lucia Méndez', 'lucia.mendez@email.com', '3114445566', '1030405060', 'hash_ejemplo_2', 'salt_ejemplo_2', 1),
 ('Roberto Gómez', 'roberto.gomez@profes.com', '3127778899', '2010203040', 'hash_ejemplo_3', 'salt_ejemplo_3', 2),
-('Ana Jurado', 'ana.jurado@admin.com', '3130001122', '3040506070', 'hash_ejemplo_4', 'salt_ejemplo_4', 3);
-('Bryan Mora', 'bryanmora18@gmail.com', '3167303517', '1019096837', 'Daki2025*', 'salt_ejemplo_5', 3);
+('Ana Jurado', 'ana.jurado@admin.com', '3130001122', '3040506070', 'hash_ejemplo_4', 'salt_ejemplo_4', 3),
+('Bryan Mora', 'bryanmora18@gmail.com', '3167303517', '1019096837', 'Daki2025*', 'salt_ejemplo_5', 3),
 ('Administrador', 'administrador@idrive.com', '3001112222', '99999999', 'hash_ejemplo_admin1234', 'salt_ejemplo_6', 3);
-
--- -----------------------------------------------------
--- Tabla `Permisos`
--- Define cada acción individual que se puede realizar en el sistema.
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Permisos` (
-  `id_permiso` INT NOT NULL AUTO_INCREMENT,
-  `nombre_permiso` VARCHAR(100) NOT NULL,
-  `descripcion` VARCHAR(255) NULL,
-  PRIMARY KEY (`id_permiso`),
-  UNIQUE INDEX `nombre_permiso_UNIQUE` (`nombre_permiso` ASC)
-)
-ENGINE = InnoDB;
 
 -- Poblar la tabla de Permisos con las acciones clave de la aplicación
 INSERT INTO `Permisos` (`nombre_permiso`, `descripcion`) VALUES
@@ -265,30 +291,6 @@ INSERT INTO `Permisos` (`nombre_permiso`, `descripcion`) VALUES
 ('agendamientos:crear:propio', 'Permite a un estudiante agendarse a una clase'),
 ('agendamientos:crear:cualquiera', 'Permite a un administrador agendar a cualquier estudiante'),
 ('agendamientos:ver:todos', 'Permite ver todos los agendamientos del sistema');
-
-
--- -----------------------------------------------------
--- Tabla `Roles_Permisos`
--- Tabla de unión que establece la relación Muchos-a-Muchos
--- entre los Roles y los Permisos.
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Roles_Permisos` (
-  `id_rol` INT NOT NULL,
-  `id_permiso` INT NOT NULL,
-  PRIMARY KEY (`id_rol`, `id_permiso`),
-  INDEX `fk_Roles_Permisos_Permisos_idx` (`id_permiso` ASC),
-  INDEX `fk_Roles_Permisos_Roles_idx` (`id_rol` ASC),
-  CONSTRAINT `fk_Roles_Permisos_Roles`
-    FOREIGN KEY (`id_rol`)
-    REFERENCES `Roles` (`id_rol`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Roles_Permisos_Permisos`
-    FOREIGN KEY (`id_permiso`)
-    REFERENCES `Permisos` (`id_permiso`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
 
 -- Asignar permisos a los roles existentes
 -- Asumimos: 1=Estudiante, 2=Profesor, 3=Administrador
@@ -326,13 +328,3 @@ INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
 INSERT INTO `Roles_Permisos` (`id_rol`, `id_permiso`) VALUES
 (3, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:calendario')),
 (2, (SELECT id_permiso FROM Permisos WHERE nombre_permiso = 'agendamientos:ver:calendario'));
-
--- Agregar columna para indicar si el usuario requiere cambiar la contraseña al primer inicio de sesión
-
-ALTER TABLE `Usuarios`
-ADD COLUMN `requiere_cambio_password` BOOLEAN NOT NULL DEFAULT TRUE AFTER `estado`;
-
-ADD COLUMN `password_reset_token` VARCHAR(255) NULL DEFAULT NULL AFTER `requiere_cambio_password`,
-ADD COLUMN `reset_token_expires` DATETIME NULL DEFAULT NULL AFTER `password_reset_token`;
-
-COMMIT;
