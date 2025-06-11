@@ -1,8 +1,11 @@
+// src/components/CambiarPassword.js
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import './AuthForm.css'; // <-- CAMBIO: Importamos el nuevo CSS
-import { FaCarSide } from "react-icons/fa"; // Para el logo
+import './AuthForm.css';
+// --- CAMBIO: Se usa la ruta relativa correcta para importar el logo ---
+import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const apiClient = axios.create({ baseURL: API_URL });
@@ -42,10 +45,10 @@ const CambiarPassword = () => {
     return (
         <div className="_AF_auth-layout">
             <div className="_AF_brand-panel">
-                <div className="_AF_brand-logo">
-                    <i className="fas fa-car-side"></i>
-                    <span>iDrive</span>
-                </div>
+                {/* --- CAMBIO: Se reemplaza el div del logo por la imagen importada --- */}
+                <Link to="/dashboard">
+                    <img src={Logo_iDrive2} alt="Logo iDrive" className="_AF_logo" />
+                </Link>
                 <h1>Bienvenido de Nuevo</h1>
                 <p>La seguridad de tu cuenta es nuestra prioridad. Por favor, establece una nueva contraseña.</p>
             </div>

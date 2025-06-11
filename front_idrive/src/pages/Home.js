@@ -128,7 +128,7 @@ const Home = () => {
             <Container>
                 <h2 className="_HM_hero-title">¿Listo para llevar tu escuela al siguiente nivel?</h2>
                 <p className="lead my-4">Únete a las escuelas que ya están optimizando su gestión con iDrive.</p>
-                <Button variant="light" size="lg" onClick={() => navigate("/contact")}>
+                <Button variant="light" size="lg" onClick={() => navigate("/Contacto")}>
                   Contáctanos ahora
                 </Button>
             </Container>

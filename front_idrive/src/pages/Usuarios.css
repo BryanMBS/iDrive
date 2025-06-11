@@ -20,7 +20,7 @@
   Esto es crucial cuando el Sidebar es `position: fixed`.
 */
 .main-layout-container {
-    display: flex; /* Ya lo tienes en el JSX, pero lo refuerzo aquí */
+    display: flex; /* Contenedor principal */
     min-height: 100vh; /* Para que ocupe toda la altura de la ventana */
 }
 
@@ -264,4 +264,44 @@
     background-color: var(--secondary-color_User);
     color: var(--white_User);
     box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+}
+.status-badge {
+    padding: 0.3em 0.75em;
+    border-radius: 50rem; /* Para hacerlo tipo "píldora" */
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.status-activo {
+    background-color: rgba(25, 135, 84, 0.15); /* Verde suave de fondo */
+    color: #0f5132; /* Verde oscuro para el texto */
+}
+
+.status-inactivo {
+    background-color: rgba(108, 117, 125, 0.15); /* Gris suave de fondo */
+    color: #41464b; /* Gris oscuro para el texto */
+}
+
+
+/* --- CAMBIO: Estilos para el nuevo botón de Activar/Desactivar --- */
+.btn-status {
+    font-weight: 500;
+}
+
+.btn-status-active {
+    background-color: #6c757d; /* Botón gris para la acción de desactivar */
+    color: #fff;
+}
+.btn-status-active:hover {
+    background-color: #5c636a;
+}
+
+.btn-status-inactive {
+    background-color: #198754; /* Botón verde para la acción de activar */
+    color: #fff;
+}
+.btn-status-inactive:hover {
+    background-color: #157347;
 }

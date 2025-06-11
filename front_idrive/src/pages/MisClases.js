@@ -50,15 +50,29 @@ const MisClases = () => {
       alert("Por favor, selecciona una clase y proporciona tu cédula.");
       return;
     }
+    
+    // --- CAMBIO: Se añade un diálogo de confirmación ---
+    const isConfirmed = window.confirm(
+        "¿Estás seguro de que deseas agendar esta clase? Tu cupo quedará confirmado inmediatamente."
+    );
+
+    // Si el usuario presiona "Cancelar", la función se detiene aquí.
+    if (!isConfirmed) {
+        return;
+    }
+
     try {
         await apiClient.post("/agendamientos/", { 
             id_clase: parseInt(formulario.id_clase), 
             cedula: formulario.cedula
         });
-        alert("Clase agendada con éxito!");
+        
+        // --- CAMBIO: Mensaje de éxito actualizado ---
+        alert("¡Excelente! Tu cupo en la clase ha sido confirmado.");
+        
         setShowModal(false);
         setFormulario({ id_clase: '', cedula: '' });
-        fetchData(); // Recargamos todos los datos para reflejar los cambios
+        fetchData(); // Recargamos los datos para que la nueva clase aparezca en la lista
     } catch (error) {
         alert("Error al agendar la clase: " + (error.response?.data?.detail || error.message));
     }

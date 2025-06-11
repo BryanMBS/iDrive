@@ -25,17 +25,11 @@
     text-align: center;
 }
 
-._AF_brand-logo {
-    display: flex;
-    align-items: center;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary-color); /* Azul brillante para el logo */
-    margin-bottom: 1rem;
-}
-
-._AF_brand-logo i {
-    margin-right: 1rem;
+/* --- CAMBIO: Se reemplazan los estilos del logo de texto por los de imagen --- */
+._AF_logo {
+    height: 280px; /* Altura del logo */
+    width: auto; /* Ancho automático para mantener la proporción */
+    margin-bottom: 1rem; /* Espacio debajo del logo */
 }
 
 ._AF_brand-panel h1 {

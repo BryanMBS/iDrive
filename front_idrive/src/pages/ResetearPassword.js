@@ -1,8 +1,10 @@
+// src/components/ResetearPassword.js
+
 import React, { useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import './AuthForm.css'; // Reutilizamos los estilos
-import { FaCarSide } from "react-icons/fa";
+import './AuthForm.css';
+import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png'; // <- Ruta correcta ya en uso
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -11,23 +13,21 @@ const ResetearPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-    const { token } = useParams(); // Obtiene el token de la URL
+    const { token } = useParams();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setMessage('');
-
         if (newPassword.length < 8) {
             setError("La contraseña debe tener al menos 8 caracteres.");
             return;
-        }
+        } 
         if (newPassword !== confirmPassword) {
             setError("Las contraseñas no coinciden.");
             return;
         }
-
         try {
             await axios.post(`${API_URL}/usuarios/reseteo-password`, { token, new_password: newPassword });
             setMessage("¡Contraseña restablecida con éxito! Serás redirigido para iniciar sesión en 3 segundos.");
@@ -40,10 +40,7 @@ const ResetearPassword = () => {
     return (
         <div className="_AF_auth-layout">
             <div className="_AF_brand-panel">
-                <div className="_AF_brand-logo">
-                    <i className="fas fa-car-side"></i>
-                    <span>iDrive</span>
-                </div>
+                <Link to="/"><img src={Logo_iDrive2} alt="Logo iDrive" className="_AF_logo" /></Link>
                 <h1>Casi Listo</h1>
                 <p>Establece tu nueva contraseña. Asegúrate de que sea segura y fácil de recordar para ti.</p>
             </div>

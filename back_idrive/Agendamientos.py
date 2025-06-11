@@ -79,7 +79,7 @@ def get_agendamientos(db_conn=Depends(get_db_connection)):
     "/",
     response_model=AgendamientoDetalle,
     status_code=status.HTTP_201_CREATED,
-    summary="Agendar una clase para un estudiante usando su cédula"
+    summary="Agendar una clase para un estudiante usando su cédula (con autoconfirmación)"
 )
 def agendar_clase_cedula(
     agendamiento_data: AgendamientoCrearPorCedula,
@@ -94,12 +94,14 @@ def agendar_clase_cedula(
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Estudiante no encontrado.")
         id_estudiante = student['id_usuario']
 
-        # Insertar el nuevo agendamiento
+        # --- CAMBIO PRINCIPAL: La consulta ahora inserta el estado como 'Confirmado' ---
+        # --- y establece la fecha de confirmación inmediatamente.                  ---
         insert_query = """
-            INSERT INTO Agendamientos (id_estudiante, id_clase, metodo_reserva, fecha_reserva, estado)
-            VALUES (%s, %s, %s, NOW(), 'Pendiente')
+            INSERT INTO Agendamientos (id_estudiante, id_clase, metodo_reserva, fecha_reserva, estado, fecha_confirmacion)
+            VALUES (%s, %s, %s, NOW(), 'Confirmado', NOW())
         """
-        cursor.execute(insert_query, (id_estudiante, agendamiento_data.id_clase, agendamiento_data.metodo_reserva))
+        # Se asume que el método de reserva es 'web' o 'movil' desde la app del estudiante
+        cursor.execute(insert_query, (id_estudiante, agendamiento_data.id_clase, agendamiento_data.metodo_reserva or 'web'))
         agendamiento_id = cursor.lastrowid
         db_conn.commit()
 
@@ -112,11 +114,11 @@ def agendar_clase_cedula(
         if not new_agendamiento:
              raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "No se pudo recuperar el agendamiento creado.")
 
-        logger.info(f"Nuevo agendamiento creado con ID: {agendamiento_id}")
+        logger.info(f"Nuevo agendamiento CREADO y CONFIRMADO con ID: {agendamiento_id}")
         return new_agendamiento
     except MySQLC_Error as err:
         db_conn.rollback()
-        if err.errno == 1452: # Falla la restricción de clave foránea
+        if err.errno == 1452:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="La clase o estudiante especificado no existe.")
         logger.error(f"Error de base de datos al crear agendamiento: {err}")
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error de base de datos al crear agendamiento.")

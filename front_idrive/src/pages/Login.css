@@ -1,6 +1,6 @@
 /* El login-container_Login ahora manejará su propio fondo */
 .login-container_Login {
-    background-image: url('../assets/img/FondoLogin2.png'); /* ¡Asegúrate de que esta ruta sea correcta! */
+    background-image: url('../assets/img/FondoLogin2.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

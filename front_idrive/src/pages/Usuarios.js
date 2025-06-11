@@ -1,4 +1,4 @@
-// Usuarios.js
+// src/pages/Usuarios.js
 
 import React, { useEffect, useState, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
@@ -25,8 +25,6 @@ const Usuarios = () => {
   const [usuarioEditandoId, setUsuarioEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [errorApi, setErrorApi] = useState(null);
-
-  // CAMBIO: Se elimina 'password' del estado inicial del formulario
   const [formulario, setFormulario] = useState({
     nombre: "", correo_electronico: "", telefono: "", cedula: "", id_rol: "",
   });
@@ -51,30 +49,28 @@ const Usuarios = () => {
     } catch (err) {
       console.error("Error al cargar roles:", err);
       setErrorApi(`No se pudieron cargar los roles: ${err.response?.data?.detail || err.message}.`);
-      setRoles([]);
     }
   }, []);
 
   useEffect(() => {
-    fetchRoles();
-    fetchUsuarios();
-  }, [fetchUsuarios, fetchRoles]);
+    // Solo intentar cargar los datos si el usuario tiene permiso
+    if (hasPermission('usuarios:leer')) {
+      fetchRoles();
+      fetchUsuarios();
+    } else {
+      setErrorApi("No tienes permiso para ver esta sección.");
+    }
+  }, [hasPermission, fetchUsuarios, fetchRoles]);
 
   const handleCrearUsuario = async () => {
-    // CAMBIO: Se ajusta el payload para que no incluya la contraseña
     const { password, ...datosParaEnviar } = formulario;
     if (!datosParaEnviar.nombre || !datosParaEnviar.correo_electronico || !datosParaEnviar.cedula || !datosParaEnviar.id_rol) {
       alert("Por favor, complete todos los campos requeridos.");
       return;
     }
-
     try {
-      // El backend ahora es 'UsuarioCreateAdmin' que no espera contraseña
       const response = await apiClient.post("/usuarios/", datosParaEnviar);
-      
-      // CAMBIO: Se muestra la contraseña temporal devuelta por el backend
-      alert(`Usuario creado con éxito.\n\nContraseña Temporal: ${response.data.password_temporal}\n\nPor favor, entrégala al nuevo usuario para su primer inicio de sesión.`);
-      
+      alert(`Usuario creado con éxito.\n\nContraseña Temporal: ${response.data.password_temporal}\n\nPor favor, entrégala al nuevo usuario.`);
       cerrarModalYLimpiar();
       fetchUsuarios();
     } catch (err) {
@@ -108,28 +104,33 @@ const Usuarios = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    setFormulario({ ...formulario, [e.target.name]: e.target.value });
+  const handleCambiarEstado = async (idUsuario, estadoActual) => {
+    const nuevoEstado = estadoActual === 'activo' ? 'inactivo' : 'activo';
+    const accion = nuevoEstado === 'activo' ? 'activar' : 'desactivar';
+
+    if (!window.confirm(`¿Está seguro de que desea ${accion} a este usuario?`)) return;
+
+    try {
+      await apiClient.put(`/usuarios/${idUsuario}`, { estado: nuevoEstado });
+      alert(`Usuario ${accion}do exitosamente.`);
+      fetchUsuarios();
+    } catch (err) {
+      alert(`Hubo un error al cambiar el estado: ${err.response?.data?.detail || err.message}`);
+    }
   };
 
-  const resetFormulario = () => {
-    // CAMBIO: El reseteo del formulario ya no incluye el campo password
-    setFormulario({ nombre: "", correo_electronico: "", telefono: "", cedula: "", id_rol: "" });
-  };
-
-  const abrirModalParaCrear = () => {
-    setEditando(false);
-    resetFormulario();
-    setModalVisible(true);
-  };
-
+  const handleInputChange = (e) => setFormulario({ ...formulario, [e.target.name]: e.target.value });
+  const resetFormulario = () => setFormulario({ nombre: "", correo_electronico: "", telefono: "", cedula: "", id_rol: "" });
+  const abrirModalParaCrear = () => { setEditando(false); resetFormulario(); setModalVisible(true); };
+  const cerrarModalYLimpiar = () => { setModalVisible(false); setEditando(false); setUsuarioEditandoId(null); resetFormulario(); };
+  
   const handleEditarUsuario = (usuario) => {
     setFormulario({
       nombre: usuario.nombre,
       correo_electronico: usuario.correo_electronico,
       telefono: usuario.telefono,
       cedula: usuario.cedula,
-      password: "", // El campo se deja vacío para la edición
+      password: "",
       id_rol: usuario.id_rol,
     });
     setUsuarioEditandoId(usuario.id_usuario);
@@ -137,16 +138,7 @@ const Usuarios = () => {
     setModalVisible(true);
   };
 
-  const cerrarModalYLimpiar = () => {
-    setModalVisible(false);
-    setEditando(false);
-    setUsuarioEditandoId(null);
-    resetFormulario();
-  };
-
-  const usuariosFiltrados = usuarios.filter((u) =>
-    u.nombre && u.nombre.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  const usuariosFiltrados = usuarios.filter((u) => u.nombre?.toLowerCase().includes(busqueda.toLowerCase()));
 
   return (
     <div className="d-flex main-layout-container">
@@ -155,7 +147,6 @@ const Usuarios = () => {
         <div className="container-fluid mt-4 usuarios-container">
           <div className="usuarios-header d-flex justify-content-between align-items-center mb-4">
             <h2 className="usuarios-title">Gestión de Usuarios</h2>
-            {/* El botón solo se muestra si el usuario tiene el permiso */}
             {hasPermission('usuarios:crear') && (
               <button className="btn_User btn-primary_User" onClick={abrirModalParaCrear}>
                 Crear Usuario
@@ -170,7 +161,7 @@ const Usuarios = () => {
             <table className="table table-hover usuarios-table">
               <thead>
                 <tr>
-                  <th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Cédula</th><th>Rol</th><th>Acciones</th>
+                  <th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Estado</th><th>Rol</th><th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -180,11 +171,16 @@ const Usuarios = () => {
                       <td>{u.nombre}</td>
                       <td>{u.correo_electronico}</td>
                       <td>{u.telefono}</td>
-                      <td>{u.cedula}</td>
+                      <td><span className={`status-badge status-${u.estado}`}>{u.estado}</span></td>
                       <td>{u.nombre_rol}</td>
                       <td className="acciones-buttons_User">
                         {hasPermission('usuarios:editar') && (
-                          <button className="btn_User btn-edit_User me-2" onClick={() => handleEditarUsuario(u)}>Editar</button>
+                           <>
+                            <button className={`btn_User btn-status me-2 ${u.estado === 'activo' ? 'btn-status-active' : 'btn-status-inactive'}`} onClick={() => handleCambiarEstado(u.id_usuario, u.estado)}>
+                              {u.estado === 'activo' ? 'Desactivar' : 'Activar'}
+                            </button>
+                            <button className="btn_User btn-edit_User me-2" onClick={() => handleEditarUsuario(u)}>Editar</button>
+                           </>
                         )}
                         {hasPermission('usuarios:eliminar') && (
                           <button className="btn_User btn-delete_User" onClick={() => handleEliminarUsuario(u.id_usuario)}>Eliminar</button>
@@ -194,7 +190,9 @@ const Usuarios = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center">No hay usuarios para mostrar.</td>
+                    <td colSpan="7" className="text-center">
+                      {errorApi ? "No tienes permiso para ver los usuarios." : "No hay usuarios para mostrar."}
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -208,12 +206,9 @@ const Usuarios = () => {
                 <input type="email" name="correo_electronico" placeholder="Correo" value={formulario.correo_electronico} onChange={handleInputChange} className="modal-input_User" />
                 <input type="text" name="telefono" placeholder="Teléfono" value={formulario.telefono} onChange={handleInputChange} className="modal-input_User" />
                 <input type="text" name="cedula" placeholder="Cédula" value={formulario.cedula} onChange={handleInputChange} className="modal-input_User" />
-                
-                {/* CAMBIO: El campo de contraseña solo aparece si se está editando un usuario */}
                 {editando && (
                   <input type="password" name="password" placeholder="Nueva contraseña (opcional)" onChange={handleInputChange} className="modal-input_User" />
                 )}
-                
                 <select name="id_rol" value={formulario.id_rol} onChange={handleInputChange} className="modal-select_User">
                   <option value="">Seleccione un rol</option>
                   {roles.map((rol) => (<option key={rol.id_rol} value={rol.id_rol}>{rol.nombre_rol}</option>))}

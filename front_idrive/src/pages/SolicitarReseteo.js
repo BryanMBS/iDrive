@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './AuthForm.css'; // Reutilizamos los estilos
-import { FaCarSide } from "react-icons/fa";
+// --- CAMBIO: Se importa el logo en lugar del ícono ---
+import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
+// Componente para solicitar reseteo de contraseña
 const SolicitarReseteo = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-
+    
+    // Maneja el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -19,17 +22,18 @@ const SolicitarReseteo = () => {
             const response = await axios.post(`${API_URL}/usuarios/solicitar-reseteo`, { correo_electronico: email });
             setMessage(response.data.message);
         } catch (err) {
-            setError("Ocurrió un error. Inténtalo de nuevo más tarde.");
+            setError(err.response?.data?.detail || "Ocurrió un error. Inténtalo de nuevo más tarde.");
         }
     };
 
+    // Renderiza el formulario de solicitud de reseteo
     return (
         <div className="_AF_auth-layout">
             <div className="_AF_brand-panel">
-                <div className="_AF_brand-logo">
-                    <i className="fas fa-car-side"></i>
-                    <span>iDrive</span>
-                </div>
+                {/* --- CAMBIO: Se reemplaza el logo de ícono por el de imagen --- */}
+                <Link to="/">
+                    <img src={Logo_iDrive2} alt="Logo iDrive" className="_AF_logo" />
+                </Link>
                 <h1>¿Olvidaste tu Contraseña?</h1>
                 <p>No te preocupes. Ingresa tu correo y te ayudaremos a recuperar el acceso a tu cuenta.</p>
             </div>

@@ -3,6 +3,8 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 import { useAuth } from '../context/AuthContext';
+// --- CAMBIO: Se importa el logo ---
+import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png'; 
 
 const Sidebar = () => {
     const navigate = useNavigate();
@@ -16,7 +18,13 @@ const Sidebar = () => {
 
     return (
         <ul className="_SD_sidebar">
-            {/* ... (Brand, Dashboard, etc. sin cambios) ... */}
+            {/* --- CAMBIO: Se añade el logo en la parte superior --- */}
+            <div className="_SD_brand-container">
+                <Link to="/dashboard">
+                    <img src={Logo_iDrive2} alt="Logo iDrive" className="_SD_brand-logo" />
+                </Link>
+            </div>
+
             <li className={`_SD_nav-item ${location.pathname === "/dashboard" ? "_SD_active" : ""}`}>
                 <Link className="_SD_nav-link" to="/dashboard">
                     <i className="fas fa-tachometer-alt"></i><span>Dashboard</span>
@@ -49,7 +57,6 @@ const Sidebar = () => {
                 </li>
             )}
 
-            {/* --- CAMBIO: El enlace a "Clases" ahora es condicional --- */}
             {hasPermission('clases:crear') && (
               <li className={`_SD_nav-item ${location.pathname === "/clases" ? "_SD_active" : ""}`}>
                   <Link className="_SD_nav-link" to="/clases">

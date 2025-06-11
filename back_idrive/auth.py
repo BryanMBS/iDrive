@@ -10,20 +10,23 @@ from typing import Optional
 # CAMBIO: Importamos el modelo desde schemas.py
 from schemas import TokenData
 
-# --- El resto del archivo se mantiene igual ---
+# CAMBIO: Definimos las constantes de configuración
 SECRET_KEY = "tu_llave_super_secreta_y_larga_para_jwt_aqui"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
+# CAMBIO: Configuramos el contexto de cifrado y el esquema OAuth2
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/usuarios/login")
 
+# Funciones para manejar la autenticación y autorización
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
+# Función para obtener el hash de la contraseña
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
+ # Función para crear un token de acceso
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
@@ -34,6 +37,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+# Función para obtener el usuario actual a partir del token
 def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -51,12 +55,13 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
         raise credentials_exception
     return token_data
 
+# Función para verificar permisos específicos
 def has_permission(required_permission: str):
-    def permission_checker(current_user: TokenData = Depends(get_current_user)):
-        if required_permission not in current_user.permisos:
-            raise HTTPException(
+    def permission_checker(current_user: TokenData = Depends(get_current_user)): # Usamos TokenData
+        if required_permission not in current_user.permisos:     # Verificamos los permisos del usuario
+            raise HTTPException( 
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="No tienes permiso para realizar esta acción",
             )
-        return current_user
-    return permission_checker
+        return current_user   # Retornamos el usuario actual si tiene permiso
+    return permission_checker # Retornamos el verificador de permisos
