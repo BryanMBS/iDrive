@@ -1,20 +1,19 @@
-// Agendamientos.js
+// Agendamientos.js (Corregido y Completo)
 
-// --- Importaciones de Módulos y Componentes ---
 import React, { useState, useEffect, useCallback } from "react";
-import FullCalendar from "@fullcalendar/react"; // El componente principal del calendario
-import dayGridPlugin from "@fullcalendar/daygrid"; // Plugin para la vista de mes
-import interactionPlugin from "@fullcalendar/interaction"; // Plugin para interacciones como hacer clic en fechas/eventos
-import axios from "axios"; // Para realizar peticiones HTTP a la API
-import "./Agendamientos.css"; // Estilos específicos para esta página
-import Sidebar from "../components/Sidebar"; // Componente del menú lateral
-import { useAuth } from '../context/AuthContext'; // Hook para verificar permisos del usuario
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import axios from "axios";
+import "./Agendamientos.css";
+import Sidebar from "../components/Sidebar";
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from "../context/NotificationContext";
+import ConfirmationModal from "../components/ConfirmationModal";
 
-// --- Configuración del Cliente de API con Axios ---
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const apiClient = axios.create({ baseURL: API_URL });
 
-// Interceptor: Se ejecuta antes de cada petición para añadir el token de autenticación
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -23,133 +22,132 @@ apiClient.interceptors.request.use(config => {
   return config;
 });
 
-// --- Componente Principal de Agendamientos (Vista de Administrador) ---
 const Agendamientos = () => {
-  // --- Estados del Componente ---
-  const { hasPermission } = useAuth(); // Función para verificar permisos del rol actual
+  const { hasPermission } = useAuth();
+  const { addNotification } = useNotification();
 
-  // Estados para almacenar datos de la API
   const [clases, setClases] = useState([]);
   const [agendamientos, setAgendamientos] = useState([]);
-
-  // Estados para controlar la visibilidad de los diferentes modales
   const [showAgendarModal, setShowAgendarModal] = useState(false);
   const [showCancelarModal, setShowCancelarModal] = useState(false);
   const [showEventDetailModal, setShowEventDetailModal] = useState(false);
   const [showDayClassesModal, setShowDayClassesModal] = useState(false);
-  
-  // Estados para almacenar datos seleccionados por el usuario
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedDayClasses, setSelectedDayClasses] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
-
-  // Estados para los formularios de los modales
   const [formularioAgendamiento, setFormularioAgendamiento] = useState({ cedula: "", id_clase: "" });
   const [idAgendamientoParaCancelar, setIdAgendamientoParaCancelar] = useState('');
 
-  // --- Funciones para Obtener Datos de la API ---
-  // useCallback optimiza estas funciones para que no se recreen en cada renderizado
+  const [confirmation, setConfirmation] = useState({
+    show: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    confirmText: 'Confirmar',
+    confirmVariant: 'btn-primary'
+  });
+
   const fetchClases = useCallback(async () => {
     try {
       const response = await apiClient.get("/clases/");
       setClases(response.data || []);
     } catch (err) {
-      alert("Error al cargar clases: " + (err.response?.data?.detail || err.message));
+      addNotification("Error al cargar clases: " + (err.response?.data?.detail || err.message), 'error');
     }
-  }, []);
+  }, [addNotification]);
 
   const fetchAgendamientos = useCallback(async () => {
     try {
       const response = await apiClient.get("/agendamientos/");
       setAgendamientos(response.data || []);
     } catch (err) {
-      if(err.response?.status !== 404) { // No mostrar alerta si simplemente no hay datos (404)
-        alert("Error al cargar agendamientos: " + (err.response?.data?.detail || err.message));
+      if(err.response?.status !== 404) {
+        addNotification("Error al cargar agendamientos: " + (err.response?.data?.detail || err.message), 'error');
       }
     }
-  }, []);
+  }, [addNotification]);
 
-  // Función que agrupa las peticiones iniciales
   const loadInitialData = useCallback(async () => {
-    await Promise.all([fetchClases(), fetchAgendamientos()]); // Se ejecutan en paralelo para eficiencia
+    await Promise.all([fetchClases(), fetchAgendamientos()]);
   }, [fetchClases, fetchAgendamientos]);
 
-  // useEffect se ejecuta una vez cuando el componente se monta para cargar los datos
   useEffect(() => {
     loadInitialData();
   }, [loadInitialData]);
   
-  // --- Lógica para Procesar y Mostrar Eventos en el Calendario ---
   const eventos = clases.map((clase) => {
-    // Para cada clase, contamos cuántos agendamientos tiene asociados
     const registrados = agendamientos.filter(a => a.id_clase === clase.id_clase).length;
     const cuposDisponibles = clase.cupos_disponibles;
-    // Si la clase está llena, se mostrará en color rojo
     const color = registrados >= cuposDisponibles ? '#e74a3b' : '#2C3E50';
-
-    // Se crea el objeto que FullCalendar entiende como un evento
     return {
       id: clase.id_clase,
       title: `${clase.nombre_clase} (${registrados}/${cuposDisponibles})`,
       date: new Date(clase.fecha_hora).toISOString().split('T')[0],
       backgroundColor: color,
       borderColor: color,
-      extendedProps: { // Almacenamos todos los datos extra aquí para usarlos en los modales
-        ...clase,
-        registrados: registrados,
-      },
+      extendedProps: { ...clase, registrados: registrados },
     };
   });
-
-  // --- Manejadores de Formularios y Acciones del Usuario ---
 
   const handleAgendamientoInputChange = (e) => setFormularioAgendamiento({ ...formularioAgendamiento, [e.target.name]: e.target.value });
   
   const handleAgendarClase = async () => {
     if (!formularioAgendamiento.cedula || !formularioAgendamiento.id_clase) {
-      alert("Por favor, completa todos los campos para agendar.");
+      addNotification("Por favor, completa todos los campos para agendar.", 'error');
       return;
     }
-    const isConfirmed = window.confirm("¿Está seguro de que desea agendar a este estudiante en la clase seleccionada?");
-    if (!isConfirmed) return;
-    try {
-      await apiClient.post("/agendamientos/", formularioAgendamiento);
-      alert("Clase agendada y confirmada exitosamente.");
-      setShowAgendarModal(false);
-      loadInitialData(); // Recargamos los datos para reflejar el nuevo agendamiento
-      setFormularioAgendamiento({ cedula: "", id_clase: "" });
-    } catch (err) {
-      alert("Error al agendar la clase: " + (err.response?.data?.detail || err.message));
-    }
+    
+    setConfirmation({
+        show: true,
+        title: "Confirmar Agendamiento",
+        message: "¿Está seguro de que desea agendar a este estudiante en la clase seleccionada?",
+        onConfirm: async () => {
+            try {
+                await apiClient.post("/agendamientos/", formularioAgendamiento);
+                addNotification("Clase agendada y confirmada exitosamente.", 'success');
+                setShowAgendarModal(false);
+                loadInitialData();
+                setFormularioAgendamiento({ cedula: "", id_clase: "" });
+            } catch (err) {
+                addNotification("Error al agendar la clase: " + (err.response?.data?.detail || err.message), 'error');
+            }
+            setConfirmation({ ...confirmation, show: false });
+        }
+    });
   };
   
   const handleCancelarAgendamiento = async () => {
     if (!idAgendamientoParaCancelar) {
-      alert("Por favor, selecciona un agendamiento de la lista para cancelar.");
+      addNotification("Por favor, selecciona un agendamiento de la lista para cancelar.", 'error');
       return;
     }
-    if (!window.confirm(`¿Está seguro de que desea cancelar el agendamiento seleccionado (ID: ${idAgendamientoParaCancelar})?`)) {
-        return;
-    }
-    try {
-      // Llamamos al endpoint DELETE con el ID único del agendamiento
-      await apiClient.delete(`/agendamientos/${idAgendamientoParaCancelar}`);
-      alert("Agendamiento cancelado exitosamente.");
-      setShowCancelarModal(false);
-      loadInitialData(); // Recargamos para que el calendario se actualice
-      setIdAgendamientoParaCancelar('');
-    } catch (err) {
-      alert(`Error al cancelar el agendamiento: ${err.response?.data?.detail || err.message}`);
-    }
+
+    setConfirmation({
+        show: true,
+        title: "Confirmar Cancelación",
+        message: `¿Está seguro de que desea cancelar el agendamiento seleccionado (ID: ${idAgendamientoParaCancelar})?`,
+        confirmVariant: 'btn-danger_User',
+        confirmText: 'Sí, Cancelar',
+        onConfirm: async () => {
+            try {
+                await apiClient.delete(`/agendamientos/${idAgendamientoParaCancelar}`);
+                addNotification("Agendamiento cancelado exitosamente.", 'success');
+                setShowCancelarModal(false);
+                loadInitialData();
+                setIdAgendamientoParaCancelar('');
+            } catch (err) {
+                addNotification(`Error al cancelar el agendamiento: ${err.response?.data?.detail || err.message}`, 'error');
+            }
+            setConfirmation({ ...confirmation, show: false });
+        }
+    });
   };
 
-  // Se activa al hacer clic en un evento del calendario
   const handleEventClick = (clickInfo) => {
     setSelectedEvent(clickInfo.event.extendedProps);
     setShowEventDetailModal(true);
   };
   
-  // Se activa al hacer clic en una fecha vacía del calendario
   const handleDateClick = (info) => {
     const clickedDate = info.dateStr;
     setSelectedDate(clickedDate);
@@ -158,7 +156,6 @@ const Agendamientos = () => {
     setShowDayClassesModal(true);
   };
   
-  // --- Renderizado del Componente JSX ---
   return (
     <div className="d-flex">
       <Sidebar />
@@ -174,10 +171,8 @@ const Agendamientos = () => {
             height="auto"
             eventClick={handleEventClick}
             dateClick={handleDateClick}
-            // --- INICIO DE LA MODIFICACIÓN ---
             headerToolbar={{ left: "prev,next today", center: "title", right: "dayGridMonth,dayGridWeek" }}
             buttonText={{ today: "Hoy", month: "Mes", week: "Semana" }}
-            // --- FIN DE LA MODIFICACIÓN ---
           />
 
           <div className="agendamiento-botones">
@@ -191,9 +186,6 @@ const Agendamientos = () => {
         </div>
       </div>
 
-      {/* --- Sección de Modales (se renderizan condicionalmente) --- */}
-
-      {/* Modal para Agendar una Nueva Clase */}
       {showAgendarModal && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -222,7 +214,6 @@ const Agendamientos = () => {
         </div>
       )}
 
-      {/* Modal para Cancelar un Agendamiento */}
       {showCancelarModal && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -248,7 +239,6 @@ const Agendamientos = () => {
         </div>
       )}
 
-      {/* Modal para ver Detalles del Evento */}
       {showEventDetailModal && selectedEvent && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -264,7 +254,6 @@ const Agendamientos = () => {
         </div>
       )}
       
-      {/* Modal para ver Clases del Día */}
       {showDayClassesModal && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -291,6 +280,16 @@ const Agendamientos = () => {
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        show={confirmation.show}
+        title={confirmation.title}
+        message={confirmation.message}
+        onConfirm={confirmation.onConfirm}
+        onClose={() => setConfirmation({ ...confirmation, show: false })}
+        confirmText={confirmation.confirmText}
+        confirmVariant={confirmation.confirmVariant}
+      />
     </div>
   );
 };

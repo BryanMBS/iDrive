@@ -18,7 +18,6 @@
     flex-grow: 1;
     padding: 2rem;
     background-color: var(--mc-color-fondo);
-    /* CAMBIO CLAVE: Deja espacio para el Sidebar en escritorio */
     margin-left: 250px; 
     transition: margin-left 0.3s ease;
 }
@@ -32,20 +31,18 @@
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--mc-color-borde);
 }
-
 ._MC_header h1 {
     font-size: 1.75rem;
     font-weight: 600;
     color: var(--mc-color-texto-principal);
 }
-
 ._MC_btn-primary {
     background-color: var(--mc-color-primario);
     color: white;
     border: none;
     padding: 0.6rem 1.2rem;
     border-radius: var(--mc-radio-borde);
-    font-weight: 500;
+    font-weight: 350;
     cursor: pointer;
     transition: background-color 0.2s;
 }
@@ -53,69 +50,111 @@
     background-color: var(--mc-color-primario-hover);
 }
 
-/* --- Grid para las Tarjetas de Clases --- */
-._MC_clases-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-}
-
-._MC_clase-card {
+/* --- Estilos para el Contenedor de Progreso --- */
+._MC_progreso-container {
     background-color: var(--mc-color-superficie);
-    border: 1px solid var(--mc-color-borde);
     border-radius: var(--mc-radio-borde);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem; 
     box-shadow: var(--mc-sombra-suave);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--mc-color-borde);
 }
-._MC_clase-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-}
-
-._MC_card-header {
-    padding: 1rem 1.25rem;
-    background-color: var(--mc-color-fondo);
-    border-bottom: 1px solid var(--mc-color-borde);
+._MC_progreso-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 0.75rem;
 }
-._MC_card-header h3 {
+._MC_progreso-header h3 {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--mc-color-texto-principal);
 }
+._MC_progreso-header span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--mc-color-texto-secundario);
+}
+._MC_progreso-bar-externo {
+    height: 12px;
+    width: 100%;
+    background-color: var(--mc-color-fondo);
+    border-radius: 50rem;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+._MC_progreso-bar-interno {
+    height: 100%;
+    background-color: var(--mc-color-primario);
+    border-radius: 50rem;
+    transition: width 0.4s ease-in-out;
+}
+
+/* --- Estilos para la Lista de Clases --- */
+._MC_clases-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+._MC_list-item {
+    background-color: var(--mc-color-superficie);
+    border: 1px solid var(--mc-color-borde);
+    border-radius: var(--mc-radio-borde);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 4px solid transparent;
+}
+._MC_list-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--mc-sombra-suave);
+    border-left: 4px solid var(--mc-color-primario);
+}
+._MC_list-item-info h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--mc-color-texto-principal);
+}
+._MC_list-item-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--mc-color-texto-secundario);
+}
 
 ._MC_estado-badge {
     padding: 0.3em 0.65em;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 700;
     border-radius: 50rem;
-    color: white;
     text-transform: capitalize;
 }
-
 /* Colores para cada estado */
-._MC_estado-pendiente { background-color: #ffe084; color: #000; }
-._MC_estado-confirmado { background-color: #5dffb4; }
-._MC_estado-cancelado { background-color: #ff3e51; }
+._MC_estado-pendiente { background-color: #fef0c7; color: #946800; }
+._MC_estado-confirmado { background-color: #d1fadf; color: #027a48; }
+._MC_estado-cancelado { background-color: #fdecec; color: #9e2828; }
 
 ._MC_card-body {
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.85rem;
 }
 ._MC_card-body p {
     margin: 0;
-    color: var(--mc-color-texto-secundario);
-    font-size: 0.9rem;
+    color: #000;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 ._MC_card-body p strong {
-    color: #343a40;
+    color: #242628;
     min-width: 80px;
     display: inline-block;
+    font-weight: 600;
 }
 
 ._MC_no-clases {
@@ -148,17 +187,15 @@
 }
 ._MC_modal-container h2 {
     margin-top: 0;
-    margin-bottom: 0.5rem;
-}
-._MC_modal-container p {
     margin-bottom: 1.5rem;
-    color: var(--mc-color-texto-secundario);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--mc-color-borde);
 }
 ._MC_modal-input, ._MC_modal-select {
     width: 100%;
     padding: 0.75rem;
-    margin-top: 0.5rem; /* Espacio sobre el select */
-    margin-bottom: 1.5rem; /* Espacio bajo el select */
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
     border: 1px solid var(--mc-color-borde);
     border-radius: var(--mc-radio-borde);
 }
@@ -166,6 +203,7 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+    margin-top: 1.5rem;
 }
 ._MC_btn-secondary {
     background-color: #6c757d;
@@ -179,7 +217,6 @@
 /* --- Diseño Responsivo --- */
 @media (max-width: 768px) {
     ._MC_page-container {
-        /* CAMBIO CLAVE: En móvil, el margen izquierdo desaparece */
         margin-left: 0;
         padding: 1rem;
     }
@@ -188,4 +225,9 @@
         align-items: flex-start;
         gap: 1rem;
     }
+}
+html {
+  /* El valor por defecto es 100%. Reducirlo a 90% escala toda la UI. */
+  /* Puedes experimentar con 85% si quieres que sea aún más pequeño. */
+  font-size: 90%;
 }

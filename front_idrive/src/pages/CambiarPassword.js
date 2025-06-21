@@ -1,11 +1,11 @@
-// src/components/CambiarPassword.js
+// src/components/CambiarPassword.js (Corregido)
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './AuthForm.css';
-// --- CAMBIO: Se usa la ruta relativa correcta para importar el logo ---
 import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png';
+import { useNotification } from '../context/NotificationContext'; // <-- IMPORTAR
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const apiClient = axios.create({ baseURL: API_URL });
@@ -19,33 +19,32 @@ apiClient.interceptors.request.use(config => {
 const CambiarPassword = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { addNotification } = useNotification(); // <-- OBTENER FUNCIÓN
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        
         if (newPassword.length < 8) {
-            setError("La contraseña debe tener al menos 8 caracteres.");
+            addNotification("La contraseña debe tener al menos 8 caracteres.", 'error');
             return;
         }
         if (newPassword !== confirmPassword) {
-            setError("Las contraseñas no coinciden.");
+            addNotification("Las contraseñas no coinciden.", 'error');
             return;
         }
         try {
             await apiClient.put('/usuarios/cambiar-password', { new_password: newPassword });
-            alert("Contraseña cambiada exitosamente. Serás redirigido al dashboard.");
+            addNotification("Contraseña cambiada exitosamente. Serás redirigido al dashboard.", 'success');
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.detail || "Ocurrió un error.");
+            addNotification(err.response?.data?.detail || "Ocurrió un error al cambiar la contraseña.", 'error');
         }
     };
 
     return (
         <div className="_AF_auth-layout">
             <div className="_AF_brand-panel">
-                {/* --- CAMBIO: Se reemplaza el div del logo por la imagen importada --- */}
                 <Link to="/dashboard">
                     <img src={Logo_iDrive2} alt="Logo iDrive" className="_AF_logo" />
                 </Link>
@@ -73,7 +72,7 @@ const CambiarPassword = () => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                         />
-                        {error && <p className="_AF_error">{error}</p>}
+                        {/* Se elimina el mensaje de error local */}
                         <button type="submit" className="_AF_button">Guardar Contraseña</button>
                     </form>
                 </div>

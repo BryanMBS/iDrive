@@ -1,39 +1,38 @@
-// src/components/ResetearPassword.js
+// src/components/ResetearPassword.js (Corregido)
 
 import React, { useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import './AuthForm.css';
-import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png'; // <- Ruta correcta ya en uso
+import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png';
+import { useNotification } from '../context/NotificationContext'; // <-- IMPORTAR
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 const ResetearPassword = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
     const { token } = useParams();
     const navigate = useNavigate();
+    const { addNotification } = useNotification(); // <-- OBTENER FUNCIÓN
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setMessage('');
+
         if (newPassword.length < 8) {
-            setError("La contraseña debe tener al menos 8 caracteres.");
+            addNotification("La contraseña debe tener al menos 8 caracteres.", 'error');
             return;
         } 
         if (newPassword !== confirmPassword) {
-            setError("Las contraseñas no coinciden.");
+            addNotification("Las contraseñas no coinciden.", 'error');
             return;
         }
         try {
             await axios.post(`${API_URL}/usuarios/reseteo-password`, { token, new_password: newPassword });
-            setMessage("¡Contraseña restablecida con éxito! Serás redirigido para iniciar sesión en 3 segundos.");
+            addNotification("¡Contraseña restablecida con éxito! Serás redirigido para iniciar sesión.", 'success');
             setTimeout(() => navigate('/login'), 3000);
         } catch (err) {
-            setError(err.response?.data?.detail || "Error: el enlace puede ser inválido o haber expirado.");
+            addNotification(err.response?.data?.detail || "Error: el enlace puede ser inválido o haber expirado.", 'error');
         }
     };
 
@@ -65,8 +64,7 @@ const ResetearPassword = () => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                         />
-                        {message && <p style={{color: 'green', fontWeight: '500'}}>{message}</p>}
-                        {error && <p className="_AF_error">{error}</p>}
+                        {/* Se eliminan los mensajes de estado locales */}
                         <button type="submit" className="_AF_button">Guardar Nueva Contraseña</button>
                     </form>
                 </div>

@@ -11,7 +11,7 @@ from Agendamientos import agendamientosRtr
 
 # --- Buena Práctica: Creación Centralizada de la App ---
 iDriveApp = FastAPI(
-    title="API de iDriveApp",
+    title="API de iDrive",
     description="API para la gestión de una escuela de conducción, incluyendo usuarios, clases y agendamientos.",
     version="1.0.0"
 )

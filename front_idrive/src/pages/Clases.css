@@ -213,3 +213,8 @@
         overflow-y: auto; /* Habilitamos el scroll vertical si el contenido es muy largo */
     }
 }
+html {
+  /* El valor por defecto es 100%. Reducirlo a 90% escala toda la UI. */
+  /* Puedes experimentar con 85% si quieres que sea aún más pequeño. */
+  font-size: 90%;
+}

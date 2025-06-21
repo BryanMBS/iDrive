@@ -74,7 +74,7 @@ def get_agendamientos(db_conn=Depends(get_db_connection)):
     except MySQLC_Error as err:
         logger.error(f"Error al obtener agendamientos: {err}")
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "La consulta a la base de datos falló.")
-
+#---------------------------------------------------------------------------------------------------------------------------
 # Endpoint para obtener un agendamiento específico por ID
 @agendamientosRtr.post(
     "/",
@@ -157,7 +157,7 @@ def modificar_agendamiento(
 
         if not update_fields:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, "No se proporcionaron campos para actualizar.")
-
+        # Si el estado es 'Confirmado', establecer la fecha de confirmación
         update_query = f"UPDATE Agendamientos SET {', '.join(update_fields)} WHERE id_agendamiento = %s"
         update_values.append(id_agendamiento)
         cursor.execute(update_query, tuple(update_values))
@@ -167,7 +167,7 @@ def modificar_agendamiento(
         cursor.execute(f"{AGENDAMIENTO_DETALLE_QUERY} WHERE a.id_agendamiento = %s", (id_agendamiento,))
         updated_agendamiento = cursor.fetchone()
         cursor.close()
-
+        # Si no se pudo recuperar el agendamiento actualizado, lanzar un error
         if not updated_agendamiento:
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "No se pudo recuperar el agendamiento actualizado.")
 
@@ -185,6 +185,7 @@ def modificar_agendamiento(
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Cancelar un agendamiento existente"
 )
+# Cancelar un agendamiento por su ID
 def cancelar_agendamiento(
     id_agendamiento: int,
     db_conn=Depends(get_db_connection)
@@ -201,7 +202,7 @@ def cancelar_agendamiento(
         # Actualizar el estado a 'Cancelado'
         cursor.execute("UPDATE Agendamientos SET estado = 'Cancelado' WHERE id_agendamiento = %s", (id_agendamiento,))
         db_conn.commit()
-
+# Si no se afectaron filas, lanzar un error
         cursor.close()
         logger.info(f"Agendamiento con ID {id_agendamiento} cancelado exitosamente.")
     except MySQLC_Error as err:
@@ -216,6 +217,7 @@ def cancelar_agendamiento(
     response_model=List[AgendamientoDetalle],
     summary="Obtener agendamientos por estudiante"
 )
+# Obtener el nombre del estudiante por su ID
 def get_agendamientos_por_estudiante(
     id_estudiante: int,
     db_conn=Depends(get_db_connection)
@@ -241,6 +243,7 @@ def get_agendamientos_por_estudiante(
     response_model=List[AgendamientoDetalle],
     summary="Obtener agendamientos por clase"
 )
+# Obtener los agendamientos de una clase específica por su ID
 def get_agendamientos_por_clase(
     id_clase: int,
     db_conn=Depends(get_db_connection)
@@ -266,6 +269,7 @@ def get_agendamientos_por_clase(
     response_model=List[AgendamientoDetalle],
     summary="Obtener agendamientos por estado"
 )
+# Obtener los agendamientos filtrados por su estado (Pendiente, Confirmado, Cancelado)
 def get_agendamientos_por_estado(
     estado: Literal['Pendiente', 'Confirmado', 'Cancelado'],
     db_conn=Depends(get_db_connection)
@@ -291,6 +295,7 @@ def get_agendamientos_por_estado(
     response_model=AgendamientoDetalle,
     summary="Confirmar un agendamiento"
 )
+# Confirmar un agendamiento por su ID
 def confirmar_agendamiento(
     id_agendamiento: int,
     db_conn=Depends(get_db_connection)
@@ -335,6 +340,7 @@ def confirmar_agendamiento(
     summary="Obtener los agendamientos del usuario actual",
     dependencies=[Depends(has_permission("mis-clases:ver"))] # Protegido por permiso
 )
+# Obtener los agendamientos del estudiante actual
 def get_mis_agendamientos(
     current_user: TokenData = Depends(get_current_user),
     db_conn=Depends(get_db_connection)

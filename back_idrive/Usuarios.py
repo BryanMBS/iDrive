@@ -41,13 +41,27 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db_conn=Depend
     - Recibe correo y contraseña en un formulario estándar de OAuth2.
     - Verifica las credenciales contra la base de datos.
     - Comprueba si el usuario necesita cambiar su contraseña.
-    - Si las credenciales son válidas, obtiene los permisos del rol del usuario.
+    - Si las credenciales son válidas, obtiene los permisos y el nombre del rol del usuario.
     - Genera y devuelve un token JWT que contiene el ID de usuario y sus permisos.
     """
     cursor = db_conn.cursor(dictionary=True)
-    
-    # 1. Buscar al usuario por su correo electrónico
-    query_user = "SELECT id_usuario, nombre, id_rol, password_hash, estado, requiere_cambio_password FROM Usuarios WHERE correo_electronico = %s"
+    # 1. Consultar el usuario por correo electrónico
+    query_user = """
+        SELECT 
+            u.id_usuario, 
+            u.nombre, 
+            u.id_rol, 
+            u.password_hash, 
+            u.estado, 
+            u.requiere_cambio_password,
+            r.nombre_rol 
+        FROM 
+            Usuarios u
+        JOIN 
+            Roles r ON u.id_rol = r.id_rol
+        WHERE 
+            u.correo_electronico = %s
+    """
     cursor.execute(query_user, (form_data.username,))
     user = cursor.fetchone()
 
@@ -75,7 +89,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db_conn=Depend
         expires_delta=access_token_expires
     )
     
-    # 6. Actualizar la fecha del último acceso (solo si no es el primer login)
+    # 6. Actualizar la fecha del último acceso
     if not user['requiere_cambio_password']:
       cursor.execute("UPDATE Usuarios SET ultimo_acceso = NOW() WHERE id_usuario = %s", (user['id_usuario'],))
       db_conn.commit()
@@ -84,7 +98,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db_conn=Depend
     
     logger.info(f"Login exitoso para el usuario ID: {user['id_usuario']}")
     
-    # 7. Devolver la respuesta completa al frontend
+    # --- CAMBIO 2: Añadir 'nombre_rol' a la respuesta para el frontend ---
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -92,6 +106,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db_conn=Depend
         "id_usuario": user['id_usuario'],
         "nombre": user['nombre'],
         "id_rol": user['id_rol'],
+        "nombre_rol": user['nombre_rol'], # <-- Este campo depende de la consulta correcta
         "permisos": permisos
     }
 #-----------------------------------------------------------------------------------------------------------------------------------------------    

@@ -11,7 +11,7 @@ logger = logging.getLogger("idrive_app.database")
 logger.setLevel(logging.INFO)
 if not logger.hasHandlers():
     handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s') # Formato de log para mayor claridad de errores
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 

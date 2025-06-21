@@ -65,3 +65,8 @@
 ._CT_map-container iframe {
     border-radius: 0.375rem;
 }
+html {
+  /* El valor por defecto es 100%. Reducirlo a 90% escala toda la UI. */
+  /* Puedes experimentar con 85% si quieres que sea aún más pequeño. */
+  font-size: 90%;
+}

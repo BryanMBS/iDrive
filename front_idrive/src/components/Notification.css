@@ -1,0 +1,64 @@
+/* src/components/Notification.css */
+
+/* Usamos un prefijo _NTF_ para evitar conflictos */
+._NTF_notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    min-width: 300px;
+    max-width: 400px;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.4s ease-out forwards;
+}
+
+/* Tipos de notificación con colores de tu marca */
+._NTF_success {
+    background-color: #1cc88a; /* Verde éxito */
+}
+._NTF_error {
+    background-color: #e74a3b; /* Rojo peligro */
+}
+._NTF_info {
+    background-color: #4e73df; /* Azul primario */
+}
+
+._NTF_icon {
+    font-size: 1.5rem;
+}
+
+._NTF_message {
+    flex-grow: 1;
+    font-weight: 500;
+}
+
+._NTF_close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+._NTF_close-btn:hover {
+    opacity: 1;
+}
+
+/* Animación de entrada */
+@keyframes slideInRight {
+    from {
+        transform: translateX(110%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

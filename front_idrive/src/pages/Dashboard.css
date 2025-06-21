@@ -2,95 +2,100 @@
 
 /* Estilos para las tarjetas del Dashboard */
 .card-dashboard {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  word-wrap: break-word;
-  background-color: #fff;
-  background-clip: border-box;
-  border: 1px solid #e3e6f0;
-  border-radius: 0.35rem;
+  position: relative; /* */
+  display: flex; /* */
+  flex-direction: column; /* */
+  min-width: 0; /* */
+  word-wrap: break-word; /* */
+  background-color: #fff; /* */
+  background-clip: border-box; /* */
+  border: 1px solid #e3e6f0; /* */
+  border-radius: 0.35rem; /* */
 }
 
 .card-dashboard .card-body {
-  flex: 1 1 auto;
-  min-height: 1px;
-  padding: 1.25rem;
+  flex: 1 1 auto; /* */
+  min-height: 1px; /* */
+  padding: 1.25rem; /* */
 }
 
 .card-dashboard .card-header {
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 0;
-  background-color: #f8f9fc;
-  border-bottom: 1px solid #e3e6f0;
+  padding: 0.75rem 1.25rem; /* */
+  margin-bottom: 0; /* */
+  background-color: #f8f9fc; /* */
+  border-bottom: 1px solid #e3e6f0; /* */
 }
 
 .border-left-primary {
-  border-left: 0.25rem solid #007bff !important;
+  border-left: 0.25rem solid #007bff !important; /* */
 }
 
 .border-left-success {
-  border-left: 0.25rem solid #28a745 !important;
+  border-left: 0.25rem solid #28a745 !important; /* */
 }
 
 .border-left-info {
-  border-left: 0.25rem solid #17a2b8 !important;
+  border-left: 0.25rem solid #17a2b8 !important; /* */
 }
 
 .border-left-warning {
-  border-left: 0.25rem solid #ffc107 !important;
+  border-left: 0.25rem solid #ffc107 !important; /* */
 }
 
 .text-gray-300 {
-  color: #dddfeb !important;
+  color: #dddfeb !important; /* */
 }
 
 .text-gray-800 {
-  color: #5a5c69 !important;
+  color: #5a5c69 !important; /* */
 }
 
 .font-weight-bold {
-  font-weight: 700 !important;
+  font-weight: 700 !important; /* */
 }
 
 .text-xs {
-  font-size: .7rem;
+  font-size: .7rem; /* */
 }
 
 .text-uppercase {
-  text-transform: uppercase !important;
+  text-transform: uppercase !important; /* */
 }
 
 .shadow {
-    box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15) !important;
+    box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15) !important; /* */
 }
 
 /* Estilos para la barra de progreso */
 .progress {
-    display: flex;
-    height: 1rem;
-    overflow: hidden;
-    font-size: .75rem;
-    background-color: #eaecf4;
-    border-radius: .35rem;
+    display: flex; /* */
+    height: 1rem; /* */
+    overflow: hidden; /* */
+    font-size: .75rem; /* */
+    background-color: #eaecf4; /* */
+    border-radius: .35rem; /* */
 }
 
 .progress-sm {
-    height: .5rem;
+    height: .5rem; /* */
 }
 
 .progress-bar {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    background-color: #007bff;
-    transition: width .6s ease;
+    display: flex; /* */
+    flex-direction: column; /* */
+    justify-content: center; /* */
+    color: #fff; /* */
+    text-align: center; /* */
+    white-space: nowrap; /* */
+    background-color: #007bff; /* */
+    transition: width .6s ease; /* */
 }
 
 .bg-info {
-    background-color: #17a2b8 !important;
+    background-color: #17a2b8 !important; /* */
+}
+html {
+  /* El valor por defecto es 100%. Reducirlo a 90% escala toda la UI. */
+  /* Puedes experimentar con 85% si quieres que sea aún más pequeño. */
+  font-size: 90%;
 }

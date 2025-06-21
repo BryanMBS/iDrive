@@ -1,7 +1,9 @@
-// Clases.js
+// Clases.js (Corregido y Completo)
 
 import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
+import ConfirmationModal from "../components/ConfirmationModal";
+import { useNotification } from "../context/NotificationContext";
 import axios from 'axios';
 import "./Usuarios.css"; // Reutilizamos los estilos para consistencia
 
@@ -13,7 +15,6 @@ const apiClient = axios.create({
   baseURL: API_URL,
 });
 
-// Interceptor para añadir el token de autenticación a las peticiones
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -26,18 +27,13 @@ apiClient.interceptors.request.use(config => {
 // DATOS PREDEFINIDOS
 //---------------------------------------------
 const CLASES_TEORICAS_PREDEFINIDAS = [
-    // Clase 1 en dos módulos
     { nombre: 'Normatividad de Tránsito (Módulo 1)', descripcion: 'Conocimiento del Código Nacional de Tránsito (Ley 769 de 2002).' },
     { nombre: 'Normatividad de Tránsito (Módulo 2)', descripcion: 'Señales de tránsito, normas de circulación y sanciones.' },
-    // Clase 2 en dos módulos
     { nombre: 'Seguridad Vial (Módulo 1)', descripcion: 'Comportamiento responsable como conductor y cultura vial.' },
     { nombre: 'Seguridad Vial (Módulo 2)', descripcion: 'Técnicas y estrategias para la prevención de accidentes.' },
-    // Clase 3
     { nombre: 'Primeros Auxilios', descripcion: 'Atención inmediata en caso de accidentes, manejo básico de heridas, fracturas y reanimación.' },
-    // Clase 4 en dos módulos
     { nombre: 'Mecánica Básica (Módulo 1)', descripcion: 'Revisión preoperacional y funcionamiento básico de niveles de fluidos.' },
     { nombre: 'Mecánica Básica (Módulo 2)', descripcion: 'Funcionamiento básico del motor, frenos y sistema de luces.' },
-    // Clases restantes
     { nombre: 'Conducción Defensiva', descripcion: 'Técnicas para evitar accidentes, identificación de riesgos y manejo preventivo.' },
     { nombre: 'Factores de Riesgo al Conducir', descripcion: 'Influencia de la fatiga, alcohol, drogas, estrés y clima en la conducción.' },
     { nombre: 'Medio Ambiente y Conducción Sostenible', descripcion: 'Técnicas para reducir el impacto ambiental y emisiones contaminantes.' },
@@ -50,9 +46,7 @@ const CLASES_TEORICAS_PREDEFINIDAS = [
 // COMPONENTE PRINCIPAL DE CLASES
 //---------------------------------------------
 const Clases = () => {
-    //---------------------------------------------
-    // ESTADOS DEL COMPONENTE
-    //---------------------------------------------
+    const { addNotification } = useNotification();
     const [clases, setClases] = useState([]);
     const [profesores, setProfesores] = useState([]);
     const [salones, setSalones] = useState([]);
@@ -71,9 +65,15 @@ const Clases = () => {
         duracion_minutos: "60",
     });
 
-    //---------------------------------------------
-    // FUNCIONES PARA OBTENER DATOS DE LA API
-    //---------------------------------------------
+    const [confirmation, setConfirmation] = useState({
+        show: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+        confirmText: 'Confirmar',
+        confirmVariant: 'btn-primary'
+    });
+
     const fetchClases = useCallback(async () => {
         try {
             const response = await apiClient.get("/clases/");
@@ -108,18 +108,12 @@ const Clases = () => {
         }
     }, []);
 
-    //---------------------------------------------
-    // EFECTO PARA CARGAR DATOS INICIALES
-    //---------------------------------------------
     useEffect(() => {
         fetchClases();
         fetchProfesores();
         fetchSalones();
     }, [fetchClases, fetchProfesores, fetchSalones]);
 
-    //---------------------------------------------
-    // FUNCIONES CRUD (CREAR, ACTUALIZAR, ELIMINAR)
-    //---------------------------------------------
     const handleCrearClase = async () => {
         const datosParaEnviar = {
             ...formulario,
@@ -130,11 +124,11 @@ const Clases = () => {
         };
         try {
             await apiClient.post("/clases/", datosParaEnviar);
-            alert("Clase creada exitosamente");
+            addNotification("Clase creada exitosamente", 'success');
             cerrarModalYLimpiar();
             fetchClases();
         } catch (err) {
-            alert(`Error al crear la clase: ${err.response?.data?.detail || err.message}`);
+            addNotification(`Error al crear la clase: ${err.response?.data?.detail || err.message}`, 'error');
         }
     };
 
@@ -148,33 +142,39 @@ const Clases = () => {
         };
         try {
             await apiClient.put(`/clases/${claseEditandoId}`, datosParaEnviar);
-            alert("Clase actualizada exitosamente");
+            addNotification("Clase actualizada exitosamente", 'success');
             cerrarModalYLimpiar();
             fetchClases();
         } catch (err) {
-            alert(`Error al actualizar la clase: ${err.response?.data?.detail || err.message}`);
+            addNotification(`Error al actualizar la clase: ${err.response?.data?.detail || err.message}`, 'error');
         }
     };
 
-    const handleEliminarClase = async (idClase) => {
-        if (!window.confirm("¿Está seguro de que desea eliminar esta clase?")) return;
-        try {
-            await apiClient.delete(`/clases/${idClase}`);
-            alert("Clase eliminada exitosamente.");
-            fetchClases();
-        } catch (err) {
-            alert(`Hubo un error al eliminar la clase: ${err.response?.data?.detail || err.message}`);
-        }
+    const handleEliminarClase = (idClase, nombreClase) => {
+        setConfirmation({
+            show: true,
+            title: 'Confirmar Eliminación',
+            message: `¿Está seguro de que desea eliminar la clase "${nombreClase}"?`,
+            confirmText: 'Eliminar',
+            confirmVariant: 'btn-danger_User',
+            onConfirm: async () => {
+                try {
+                    await apiClient.delete(`/clases/${idClase}`);
+                    addNotification("Clase eliminada exitosamente.", 'success');
+                    fetchClases();
+                } catch (err) {
+                    addNotification(`Hubo un error al eliminar la clase: ${err.response?.data?.detail || err.message}`, 'error');
+                }
+                setConfirmation({ ...confirmation, show: false });
+            },
+        });
     };
     
-    //---------------------------------------------
-    // MANEJADORES DE FORMULARIO Y MODAL
-    //---------------------------------------------
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormulario({ ...formulario, [name]: value });
     };
-    
+
     const handleClasePredefinidaChange = (e) => {
         const nombreClaseSeleccionada = e.target.value;
         const claseSeleccionada = CLASES_TEORICAS_PREDEFINIDAS.find(c => c.nombre === nombreClaseSeleccionada);
@@ -189,13 +189,13 @@ const Clases = () => {
     const resetFormulario = () => {
         setFormulario({ nombre_clase: "", descripcion: "", fecha_hora: "", id_profesor: "", id_salon: "", cupos_disponibles: "", duracion_minutos: "60" });
     };
-
+    
     const abrirModalParaCrear = () => {
         setEditando(false);
         resetFormulario();
         setModalVisible(true);
     };
-
+    
     const abrirModalParaEditar = (clase) => {
         const fechaParaInput = clase.fecha_hora ? new Date(clase.fecha_hora).toISOString().slice(0, 16) : "";
         setFormulario({
@@ -211,7 +211,7 @@ const Clases = () => {
         setEditando(true);
         setModalVisible(true);
     };
-
+    
     const cerrarModalYLimpiar = () => {
         setModalVisible(false);
         setEditando(false);
@@ -219,9 +219,6 @@ const Clases = () => {
         resetFormulario();
     };
 
-    //---------------------------------------------
-    // FUNCIONES AUXILIARES DE RENDERIZADO
-    //---------------------------------------------
     const getProfesorNombre = useCallback((id) => {
         const profesor = profesores.find(p => p.id_usuario === id);
         return profesor ? profesor.nombre : 'N/A';
@@ -232,9 +229,6 @@ const Clases = () => {
         return salon ? salon.nombre_salon : 'N/A';
     }, [salones]);
 
-    //---------------------------------------------
-    // RENDERIZADO DEL COMPONENTE
-    //---------------------------------------------
     return (
         <div className="d-flex main-layout-container">
             <Sidebar />
@@ -272,7 +266,7 @@ const Clases = () => {
                                                 <button className="btn_User btn-edit_User me-2" onClick={() => abrirModalParaEditar(clase)}>
                                                     Editar
                                                 </button>
-                                                <button className="btn_User btn-delete_User" onClick={() => handleEliminarClase(clase.id_clase)}>
+                                                <button className="btn_User btn-delete_User" onClick={() => handleEliminarClase(clase.id_clase, clase.nombre_clase)}>
                                                     Eliminar
                                                 </button>
                                             </td>
@@ -286,9 +280,7 @@ const Clases = () => {
                             </tbody>
                         </table>
                     </div>
-                    {/*---------------------------------------------*/}
-                    {/* MODAL PARA CREAR/EDITAR CLASES */}
-                    {/*---------------------------------------------*/}
+
                     {modalVisible && (
                         <div className="modal-overlay_User">
                             <div className="modal-container_User">
@@ -339,6 +331,16 @@ const Clases = () => {
                             </div>
                         </div>
                     )}
+
+                    <ConfirmationModal
+                        show={confirmation.show}
+                        title={confirmation.title}
+                        message={confirmation.message}
+                        onConfirm={confirmation.onConfirm}
+                        onClose={() => setConfirmation({ ...confirmation, show: false })}
+                        confirmText={confirmation.confirmText}
+                        confirmVariant={confirmation.confirmVariant}
+                    />
                 </div>
             </div>
         </div>

@@ -1,8 +1,6 @@
-// App.js (Corregido)
-
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-
+import { NotificationProvider } from "./context/NotificationContext"; // Importación del Proveedor de Notificaciones
 // Importación de Páginas
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -26,8 +24,10 @@ function App() {
     return (
         // --- CAMBIO 2: Envolver toda la aplicación con AuthProvider ---
         <AuthProvider>
-            <Router>
-                <Routes>
+            <NotificationProvider>
+                {/* Proveedor de Notificaciones para manejar notificaciones globales */}
+                <Router>
+                 <Routes>
                     {/* Rutas Públicas */}
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
@@ -42,8 +42,9 @@ function App() {
                     <Route path="/mis-clases" element={<MisClases />} />
                     <Route path="/usuarios" element={<Usuarios />} />
                     <Route path="/clases" element={<Clases />} />
-                </Routes>
-            </Router>
+                    </Routes>
+                </Router>
+            </NotificationProvider>
         </AuthProvider>
     );
 }

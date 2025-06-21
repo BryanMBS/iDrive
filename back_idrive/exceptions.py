@@ -4,7 +4,7 @@ import mysql.connector
 import logging
 
 logger = logging.getLogger(__name__)
-
+# Manejo centralizado de errores de base de datos
 def handle_db_error(error: Exception, operation: str = "operación de base de datos"):
     """Manejo centralizado de errores de base de datos"""
     logger.error(f"Error en {operation}: {str(error)}")

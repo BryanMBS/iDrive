@@ -47,6 +47,7 @@ class LoginResponse(BaseModel):
     id_usuario: int
     nombre: str
     id_rol: int
+    nombre_rol: str
     permisos: List[str]
 
 class TokenData(BaseModel):

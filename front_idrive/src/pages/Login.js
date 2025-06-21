@@ -1,13 +1,13 @@
-// src/pages/Login.js (Actualizado)
+// src/pages/Login.js (Corregido)
 
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FaUser, FaLock } from 'react-icons/fa';
 import './Login.css';
 import Footer from '../components/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { useNotification } from '../context/NotificationContext';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -17,6 +17,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const { login } = useAuth();
+    const { addNotification } = useNotification();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -34,12 +35,11 @@ const Login = () => {
             if (response.data && response.data.access_token) {
                 login(response.data);
                 
-                // CAMBIO: Lógica de redirección basada en la respuesta del backend
                 if (response.data.requiere_cambio_password) {
-                    alert("Es tu primer inicio de sesión. Por seguridad, debes cambiar tu contraseña.");
-                    navigate('/cambiar-password'); // Redirige a la nueva página
+                    addNotification("Es tu primer inicio de sesión. Por seguridad, debes cambiar tu contraseña.", 'info');
+                    navigate('/cambiar-password');
                 } else {
-                    navigate('/dashboard'); // Redirección normal
+                    navigate('/dashboard');
                 }
             } else {
                 setError('Error de autenticación: Respuesta inesperada del servidor.');
@@ -71,7 +71,6 @@ const Login = () => {
                     {error && <p className="error-message_Login">{error}</p>}
                     <div className="options_Login">
                         <label><input type="checkbox" /> Recuérdame</label>
-                        {/* Este enlace lo implementaremos en la siguiente parte */}
                         <Link to="/solicitar-reseteo">¿Olvidaste la contraseña?</Link>
                     </div>
                     <button type="submit" className="login-btn_Login">Iniciar sesión</button>

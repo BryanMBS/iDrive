@@ -2,8 +2,9 @@
 import logging
 import sys
 from datetime import datetime
-
-def setup_logging():
+# Configuración de logging para la aplicación iDrive
+def setup_logging(): # Function to set up logging
+    """Configura el logging para la aplicación iDrive."""
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

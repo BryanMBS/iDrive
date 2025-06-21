@@ -15,7 +15,7 @@ clasesRtr = APIRouter(prefix="/clases", tags=['Gestion de Clases'])
 # --- LOS MODELOS PYDANTIC HAN SIDO MOVIDOS A schemas.py ---
 
 # --- Endpoints Protegidos ---
-
+#---------------------------------------------------------------------------------------------------------------------
 @clasesRtr.post(
     "/", 
     response_model=ClaseResponse, 
@@ -23,6 +23,7 @@ clasesRtr = APIRouter(prefix="/clases", tags=['Gestion de Clases'])
     summary="Programar una nueva clase",
     dependencies=[Depends(has_permission("clases:crear"))]  # <-- RUTA PROTEGIDA
 )
+# Crear una nueva clase
 def create_clase(clase_data: ClaseCreate, db_conn=Depends(get_db_connection)):
     """
     Crea una nueva clase en la base de datos.
@@ -53,13 +54,15 @@ def create_clase(clase_data: ClaseCreate, db_conn=Depends(get_db_connection)):
             raise HTTPException(status.HTTP_404_NOT_FOUND, "El profesor o salón especificado no existe.")
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error de base de datos al crear la clase.")
 
-
+#---------------------------------------------------------------------------------------------------------------------
+# Actualizar una clase existente
 @clasesRtr.put(
     "/{id_clase}",
     response_model=ClaseResponse,
     summary="Actualizar una clase existente",
     dependencies=[Depends(has_permission("clases:editar"))]  # <-- RUTA PROTEGIDA
 )
+# Actualizar una clase existente
 def update_clase(id_clase: int, clase_data: ClaseUpdate, db_conn=Depends(get_db_connection)):
     """
     Actualiza una clase existente.
@@ -88,14 +91,15 @@ def update_clase(id_clase: int, clase_data: ClaseUpdate, db_conn=Depends(get_db_
         return updated_clase
     except mysql.connector.Error as err:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error de base de datos al actualizar la clase.")
-
-
+#---------------------------------------------------------------------------------------------------------------------
+# Eliminar una clase existente
 @clasesRtr.delete(
     "/{id_clase}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Eliminar una clase",
     dependencies=[Depends(has_permission("clases:eliminar"))]
 )
+#funcion para eliminar una clase existente
 def delete_clase(id_clase: int, db_conn=Depends(get_db_connection)):
     """
     Elimina una clase existente por su ID.
@@ -136,10 +140,11 @@ def delete_clase(id_clase: int, db_conn=Depends(get_db_connection)):
         # Se devuelve un error genérico si algo más falla
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error al consultar la base de datos.")
 
-
+#---------------------------------------------------------------------------------------------------------------------
 # --- Endpoints Públicos (sin protección de permisos) ---
-
+# endpoints públicos para obtener clases sin necesidad de permisos específicos
 @clasesRtr.get("/", response_model=List[ClaseResponse], summary="Obtener todas las clases")
+# Obtiene una lista de todas las clases
 def get_clases(db_conn=Depends(get_db_connection)):
     """Obtiene una lista de todas las clases. Este endpoint es público."""
     query = "SELECT * FROM Clases ORDER BY fecha_hora DESC"
@@ -149,9 +154,10 @@ def get_clases(db_conn=Depends(get_db_connection)):
         return cursor.fetchall()
     except mysql.connector.Error as err:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error al consultar la base de datos.")
-
-
+#---------------------------------------------------------------------------------------------------------------------
+# Obtener una clase específica por ID
 @clasesRtr.get("/{id_clase}", response_model=ClaseResponse, summary="Obtener una clase por ID")
+# Obtiene los detalles de una clase específica por su ID
 def get_clase(id_clase: int, db_conn=Depends(get_db_connection)):
     """Obtiene los detalles de una clase específica. Este endpoint es público."""
     query = "SELECT * FROM Clases WHERE id_clase = %s"

@@ -1,36 +1,31 @@
+// src/pages/SolicitarReseteo.js (Corregido)
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import './AuthForm.css'; // Reutilizamos los estilos
-// --- CAMBIO: Se importa el logo en lugar del ícono ---
+import './AuthForm.css';
 import Logo_iDrive2 from '../assets/img/Logo_iDrive2.png';
+import { useNotification } from '../context/NotificationContext'; // <-- IMPORTAR
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-// Componente para solicitar reseteo de contraseña
 const SolicitarReseteo = () => {
     const [email, setEmail] = useState('');
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
+    const { addNotification } = useNotification(); // <-- OBTENER FUNCIÓN
     
-    // Maneja el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage('');
-        setError('');
         try {
             const response = await axios.post(`${API_URL}/usuarios/solicitar-reseteo`, { correo_electronico: email });
-            setMessage(response.data.message);
+            addNotification(response.data.message, 'success');
         } catch (err) {
-            setError(err.response?.data?.detail || "Ocurrió un error. Inténtalo de nuevo más tarde.");
+            addNotification(err.response?.data?.detail || "Ocurrió un error. Inténtalo de nuevo más tarde.", 'error');
         }
     };
 
-    // Renderiza el formulario de solicitud de reseteo
     return (
         <div className="_AF_auth-layout">
             <div className="_AF_brand-panel">
-                {/* --- CAMBIO: Se reemplaza el logo de ícono por el de imagen --- */}
                 <Link to="/">
                     <img src={Logo_iDrive2} alt="Logo iDrive" className="_AF_logo" />
                 </Link>
@@ -50,8 +45,7 @@ const SolicitarReseteo = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
-                        {message && <p style={{color: 'green', fontWeight: '500'}}>{message}</p>}
-                        {error && <p className="_AF_error">{error}</p>}
+                        {/* Se eliminan los mensajes de estado locales */}
                         <button type="submit" className="_AF_button">Enviar Enlace de Reseteo</button>
                     </form>
                     <Link to="/login" className="_AF_link">Volver a Iniciar Sesión</Link>

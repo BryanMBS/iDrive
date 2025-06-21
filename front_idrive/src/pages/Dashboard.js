@@ -4,41 +4,42 @@
 import React, { useState, useEffect, useCallback } from 'react'; // Hooks de React para estado, efectos y optimización
 import Sidebar from '../components/Sidebar'; // Componente de la barra lateral
 import axios from 'axios'; // Librería para realizar peticiones HTTP a la API
-import { useAuth } from '../context/AuthContext'; // Hook personalizado para acceder a datos de autenticación y permisos
+import { useAuth } from '../context/AuthContext'; // Hook personalizado para acceder a datos de autenticación
 import './Dashboard.css'; // Estilos específicos para el Dashboard
 import './Usuarios.css'; // Reutilizamos estilos generales de las páginas de gestión
 
 // --- Configuración del Cliente de API con Axios ---
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'; // URL del backend
-const apiClient = axios.create({ baseURL: API_URL });
+const apiClient = axios.create({ baseURL: API_URL }); //
 
 // Interceptor: Se ejecuta antes de cada petición para añadir el token de autenticación
 apiClient.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token'); //
   if (token) {
     // Si hay un token, se añade al encabezado 'Authorization'
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`; //
   }
-  return config;
+  return config; //
 });
 
 // --- Componente Principal del Dashboard ---
 const Dashboard = () => {
   // --- Estados del Componente ---
-  const { hasPermission } = useAuth(); // Obtenemos la función para verificar permisos del usuario logueado
+  // CAMBIO: Obtenemos el objeto 'user' completo además de la función de permisos
+  const { user, hasPermission } = useAuth(); //
 
   // Estado para almacenar las estadísticas que se mostrarán en las tarjetas
   const [stats, setStats] = useState({
-    clasesMes: 'N/A',
-    nuevosUsuariosMes: 'N/A',
-    tasaOcupacion: 0,
-    alertasPendientes: 'N/A',
+    clasesMes: 'N/A', //
+    nuevosUsuariosMes: 'N/A', //
+    tasaOcupacion: 0, //
+    alertasPendientes: 'N/A', //
   });
   // Estado para controlar la visualización del mensaje "Cargando..."
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); //
 
   // --- Función para Obtener y Procesar los Datos ---
-  // useCallback optimiza la función para que no se recree en cada renderizado, a menos que sus dependencias cambien
+  // useCallback optimiza la función para que no se recree en cada renderizado
   const fetchDashboardData = useCallback(async () => {
     setIsLoading(true); // Mostramos el indicador de carga
 
@@ -50,72 +51,69 @@ const Dashboard = () => {
 
       // Peticiones condicionales basadas en los permisos del usuario
       if (hasPermission('usuarios:leer')) {
-        peticiones.push(apiClient.get('/usuarios/'));
+        peticiones.push(apiClient.get('/usuarios/')); //
       } else {
-        peticiones.push(Promise.resolve({ data: [] })); // Si no tiene permiso, devolvemos una promesa resuelta con un array vacío
+        peticiones.push(Promise.resolve({ data: [] })); // Si no tiene permiso, devolvemos una promesa resuelta
       }
       
       if (hasPermission('agendamientos:ver:todos')) {
-        peticiones.push(apiClient.get('/agendamientos/'));
+        peticiones.push(apiClient.get('/agendamientos/')); //
       } else {
         peticiones.push(Promise.resolve({ data: [] })); // Igual para agendamientos
       }
       
       // Promise.all ejecuta todas las peticiones en paralelo para mayor eficiencia
-      const [resClases, resUsuarios, resAgendamientos] = await Promise.all(peticiones);
+      const [resClases, resUsuarios, resAgendamientos] = await Promise.all(peticiones); //
       
-      // Extraemos los datos de las respuestas, asegurándonos de tener un array vacío si no hay datos
-      const clasesData = resClases.data || [];
-      const usuariosData = resUsuarios.data || [];
-      const agendamientosData = resAgendamientos.data || [];
+      // Extraemos los datos de las respuestas
+      const clasesData = resClases.data || []; //
+      const usuariosData = resUsuarios.data || []; //
+      const agendamientosData = resAgendamientos.data || []; //
 
       // --- Inicia el Cálculo de las Estadísticas ---
-      const ahora = new Date();
+      const ahora = new Date(); //
       const mesActual = ahora.getMonth(); // 0 = Enero, 11 = Diciembre
-      const anioActual = ahora.getFullYear();
+      const anioActual = ahora.getFullYear(); //
 
       // 1. Cálculo: Clases programadas en el mes actual
       const clasesMes = clasesData.filter(clase => {
         const fechaClase = new Date(clase.fecha_hora);
         return fechaClase.getMonth() === mesActual && fechaClase.getFullYear() === anioActual;
-      }).length;
+      }).length; //
 
       // 2. Cálculo: Nuevos usuarios registrados en el mes actual
       const nuevosUsuariosMes = usuariosData.filter(usuario => {
         const fechaRegistro = new Date(usuario.fecha_registro);
         return fechaRegistro.getMonth() === mesActual && fechaRegistro.getFullYear() === anioActual;
-      }).length;
+      }).length; //
       
       // 3. Cálculo: Tasa de ocupación total
-      const totalCupos = clasesData.reduce((sum, clase) => sum + clase.cupos_disponibles, 0);
-      const totalAgendados = agendamientosData.length;
-      // Verificamos que totalCupos no sea 0 para evitar división por cero
-      const tasaOcupacion = totalCupos > 0 ? (totalAgendados / totalCupos) * 100 : 0;
+      const totalCupos = clasesData.reduce((sum, clase) => sum + clase.cupos_disponibles, 0); //
+      const totalAgendados = agendamientosData.length; //
+      const tasaOcupacion = totalCupos > 0 ? (totalAgendados / totalCupos) * 100 : 0; //
 
       // 4. Cálculo: Alertas (agendamientos con estado 'Pendiente')
-      const alertasPendientes = agendamientosData.filter(a => a.estado === 'Pendiente').length;
+      const alertasPendientes = agendamientosData.filter(a => a.estado === 'Pendiente').length; //
 
       // Actualizamos el estado con los nuevos valores calculados
       setStats({
-        clasesMes: clasesMes,
-        nuevosUsuariosMes: hasPermission('usuarios:leer') ? nuevosUsuariosMes : 'N/A',
-        tasaOcupacion: tasaOcupacion,
-        alertasPendientes: hasPermission('agendamientos:ver:todos') ? alertasPendientes : 'N/A',
+        clasesMes: clasesMes, //
+        nuevosUsuariosMes: hasPermission('usuarios:leer') ? nuevosUsuariosMes : 'N/A', //
+        tasaOcupacion: tasaOcupacion, //
+        alertasPendientes: hasPermission('agendamientos:ver:todos') ? alertasPendientes : 'N/A', //
       });
 
     } catch (error) {
-      console.error("Error al cargar los datos del dashboard:", error);
-      // Podríamos establecer un estado de error aquí si quisiéramos mostrar un mensaje en la UI
+      console.error("Error al cargar los datos del dashboard:", error); //
     } finally {
-      // Se ejecuta siempre, haya o no error, para ocultar el indicador de carga
-      setIsLoading(false);
+      // Se ejecuta siempre para ocultar el indicador de carga
+      setIsLoading(false); //
     }
   }, [hasPermission]); // La dependencia es 'hasPermission' para que se vuelva a ejecutar si los permisos cambian
 
   // --- Efecto de Carga Inicial ---
-  // useEffect con un array de dependencias vacío se ejecuta solo una vez, cuando el componente se monta
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardData(); //
   }, [fetchDashboardData]); // Se llama a la función de carga de datos
 
   // Si los datos aún están cargando, mostramos un mensaje simple
@@ -127,7 +125,7 @@ const Dashboard = () => {
               <h4>Cargando datos del Dashboard...</h4>
             </div>
         </div>
-    );
+    ); //
   }
 
   // --- Renderizado del Componente ---
@@ -194,7 +192,7 @@ const Dashboard = () => {
                               <div
                                 className="progress-bar bg-info"
                                 role="progressbar"
-                                style={{ width: `${stats.tasaOcupacion}%` }} // El ancho de la barra es dinámico
+                                style={{ width: `${stats.tasaOcupacion}%` }}
                                 aria-valuenow={stats.tasaOcupacion}
                                 aria-valuemin="0"
                                 aria-valuemax="100"
@@ -225,12 +223,18 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Fila de Bienvenida */}
+            {/* Fila de Bienvenida (MODIFICADA) */}
             <div className="row">
               <div className="col-lg-12 mb-4">
                 <div className="card-dashboard shadow mb-4">
                   <div className="card-header py-3">
-                    <h6 className="m-0 font-weight-bold text-primary">Bienvenido al Sistema de Administración iDrive</h6>
+                    {/* --- CAMBIO: Mensaje de Bienvenida Personalizado --- */}
+                    {/* Se accede a la variable 'user' obtenida del AuthContext. */}
+                    {/* Si el objeto 'user' y 'user.nombre' existen, se muestra el nombre. */}
+                    {/* Si no, se muestra un saludo genérico "Usuario" para evitar errores. */}
+                    <h6 className="m-0 font-weight-bold text-primary">
+                      Bienvenido al Sistema de Administración iDrive, {user ? user.nombre : 'Usuario'}
+                    </h6>
                   </div>
                   <div className="card-body">
                     <p>Desde este panel podrás gestionar todos los aspectos de la academia. Utiliza la barra lateral para navegar entre las diferentes secciones.</p>

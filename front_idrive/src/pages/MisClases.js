@@ -1,8 +1,12 @@
+// src/pages/MisClases.js (Corregido)
+
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
+import ConfirmationModal from '../components/ConfirmationModal';
 import axios from 'axios';
 import "./MisClases.css";
-import { useAuth } from '../context/AuthContext'; // Importamos el hook para obtener datos del usuario
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const apiClient = axios.create({ baseURL: API_URL });
@@ -14,18 +18,28 @@ apiClient.interceptors.request.use(config => {
 });
 
 const MisClases = () => {
-  const { user } = useAuth(); // Obtenemos la información del usuario logueado
+  const { user } = useAuth();
+  const { addNotification } = useNotification();
   const [misAgendamientos, setMisAgendamientos] = useState([]);
   const [clasesDisponibles, setClasesDisponibles] = useState([]);
-  const [agendamientosTotales, setAgendamientosTotales] = useState([]); // Para calcular cupos
+  const [agendamientosTotales, setAgendamientosTotales] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formulario, setFormulario] = useState({ id_clase: '', cedula: '' });
   const [isLoading, setIsLoading] = useState(true);
+  const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+  
+  const [confirmation, setConfirmation] = useState({ 
+      show: false, 
+      title: '', 
+      message: '', 
+      onConfirm: () => {} 
+  });
+
+  const TOTAL_CLASES_META = 13;
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Obtenemos todas las peticiones en paralelo para mejorar el rendimiento
       const [resMisAgendamientos, resClases, resAgendamientosTotales] = await Promise.all([
         apiClient.get("/agendamientos/mis-agendamientos"),
         apiClient.get("/clases/"),
@@ -47,59 +61,52 @@ const MisClases = () => {
 
   const handleAgendarClase = async () => {
     if (!formulario.id_clase || !formulario.cedula) {
-      alert("Por favor, selecciona una clase y proporciona tu cédula.");
+      addNotification("Por favor, selecciona una clase y proporciona tu cédula.", 'error');
       return;
     }
-    
-    // --- CAMBIO: Se añade un diálogo de confirmación ---
-    const isConfirmed = window.confirm(
-        "¿Estás seguro de que deseas agendar esta clase? Tu cupo quedará confirmado inmediatamente."
-    );
 
-    // Si el usuario presiona "Cancelar", la función se detiene aquí.
-    if (!isConfirmed) {
-        return;
-    }
-
-    try {
-        await apiClient.post("/agendamientos/", { 
-            id_clase: parseInt(formulario.id_clase), 
-            cedula: formulario.cedula
-        });
-        
-        // --- CAMBIO: Mensaje de éxito actualizado ---
-        alert("¡Excelente! Tu cupo en la clase ha sido confirmado.");
-        
-        setShowModal(false);
-        setFormulario({ id_clase: '', cedula: '' });
-        fetchData(); // Recargamos los datos para que la nueva clase aparezca en la lista
-    } catch (error) {
-        alert("Error al agendar la clase: " + (error.response?.data?.detail || error.message));
-    }
+    setConfirmation({
+        show: true,
+        title: "Confirmar Agendamiento",
+        message: "¿Estás seguro de que deseas agendar esta clase? Tu cupo quedará confirmado inmediatamente.",
+        onConfirm: async () => {
+            try {
+                await apiClient.post("/agendamientos/", { id_clase: parseInt(formulario.id_clase), cedula: formulario.cedula });
+                addNotification("¡Excelente! Tu cupo en la clase ha sido confirmado.", 'success');
+                setShowModal(false);
+                setFormulario({ id_clase: '', cedula: '' });
+                fetchData();
+            } catch (error) {
+                addNotification("Error al agendar la clase: " + (error.response?.data?.detail || error.message), 'error');
+            } finally {
+                setConfirmation({ ...confirmation, show: false });
+            }
+        }
+    });
   };
 
-  // --- LÓGICA DE FILTRADO DE CLASES DISPONIBLES ---
+  const handleVerDetalles = (clase) => {
+    setClaseSeleccionada(clase);
+  };
+
+  const handleCerrarDetalles = () => {
+    setClaseSeleccionada(null);
+  };
+
   const getClasesFiltradas = () => {
     const ahora = new Date();
-    // 1. Creamos un Set con los IDs de las clases en las que el estudiante ya está agendado
     const idsClasesYaAgendadas = new Set(misAgendamientos.map(a => a.id_clase));
-
-    // 2. Contamos cuántos estudiantes hay en cada clase
     const cuposOcupados = agendamientosTotales.reduce((acc, agendamiento) => {
-        acc[agendamiento.id_clase] = (acc[agendamiento.id_clase] || 0) + 1;
-        return acc;
+      acc[agendamiento.id_clase] = (acc[agendamiento.id_clase] || 0) + 1;
+      return acc;
     }, {});
 
-    // 3. Filtramos la lista de todas las clases
     return clasesDisponibles.filter(clase => {
-        const registrados = cuposOcupados[clase.id_clase] || 0;
-        
-        // La clase debe cumplir todas estas condiciones para estar disponible
-        const tieneCupo = registrados < clase.cupos_disponibles;
-        const esEnElFuturo = new Date(clase.fecha_hora) > ahora;
-        const noEstaAgendada = !idsClasesYaAgendadas.has(clase.id_clase);
-
-        return tieneCupo && esEnElFuturo && noEstaAgendada;
+      const registrados = cuposOcupados[clase.id_clase] || 0;
+      const tieneCupo = registrados < clase.cupos_disponibles;
+      const esEnElFuturo = new Date(clase.fecha_hora) > ahora;
+      const noEstaAgendada = !idsClasesYaAgendadas.has(clase.id_clase);
+      return tieneCupo && esEnElFuturo && noEstaAgendada;
     });
   };
 
@@ -113,6 +120,7 @@ const MisClases = () => {
   }
 
   const clasesFiltradasParaAgendar = getClasesFiltradas();
+  const progresoActual = Math.min((misAgendamientos.length / TOTAL_CLASES_META) * 100, 100);
 
   return (
     <div className="d-flex">
@@ -124,21 +132,30 @@ const MisClases = () => {
             + Agendar Nueva Clase
           </button>
         </div>
+
+        <div className="_MC_progreso-container">
+            <div className="_MC_progreso-header">
+                <h3>Progreso</h3>
+                <span>{misAgendamientos.length} / {TOTAL_CLASES_META} Clases</span>
+            </div>
+            <div className="_MC_progreso-bar-externo">
+                <div 
+                    className="_MC_progreso-bar-interno" 
+                    style={{ width: `${progresoActual}%` }}
+                >
+                </div>
+            </div>
+        </div>
         
-        <div className="_MC_clases-grid">
+        <div className="_MC_clases-list">
           {misAgendamientos.length > 0 ? (
             misAgendamientos.map(item => (
-              <div key={item.id_agendamiento} className={`_MC_clase-card _MC_estado-${item.estado.toLowerCase()}`}>
-                <div className="_MC_card-header">
-                  <h3>{item.nombre_clase}</h3>
-                  <span className="_MC_estado-badge">{item.estado}</span>
+              <div key={item.id_agendamiento} className="_MC_list-item" onClick={() => handleVerDetalles(item)}>
+                <div className="_MC_list-item-info">
+                    <h3>{item.nombre_clase}</h3>
+                    <p>Fecha: {new Date(item.fecha_hora).toLocaleDateString()}</p>
                 </div>
-                <div className="_MC_card-body">
-                  <p><strong>Profesor:</strong> {item.profesor}</p>
-                  <p><strong>Salón:</strong> {item.nombre_salon}</p>
-                  <p><strong>Fecha:</strong> {new Date(item.fecha_hora).toLocaleDateString()}</p>
-                  <p><strong>Hora:</strong> {new Date(item.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
+                <span className={`_MC_estado-badge _MC_estado-${item.estado.toLowerCase()}`}>{item.estado}</span>
               </div>
             ))
           ) : (
@@ -152,7 +169,6 @@ const MisClases = () => {
           <div className="_MC_modal-container">
             <h2>Agendar una Clase</h2>
             <p>Selecciona una de las clases con cupos disponibles.</p>
-            {/* CAMBIO: El input para la cédula es necesario para el backend actual */}
             <input 
               type="text"
               className="_MC_modal-input"
@@ -160,7 +176,6 @@ const MisClases = () => {
               value={formulario.cedula}
               onChange={(e) => setFormulario({...formulario, cedula: e.target.value})}
             />
-            {/* CAMBIO: El select ahora usa la lista de clases filtrada */}
             <select
               className="_MC_modal-select"
               value={formulario.id_clase}
@@ -184,6 +199,35 @@ const MisClases = () => {
           </div>
         </div>
       )}
+
+      {claseSeleccionada && (
+        <div className="_MC_modal-overlay">
+          <div className="_MC_modal-container">
+            <h2>Detalles de la Clase</h2>
+            <div className="_MC_card-body _MC_modal-detalles-body">
+                <p><strong>Clase:</strong> {claseSeleccionada.nombre_clase}</p>
+                <p><strong>Profesor:</strong> {claseSeleccionada.profesor}</p>
+                <p><strong>Salón:</strong> {claseSeleccionada.nombre_salon}</p>
+                <p><strong>Fecha:</strong> {new Date(claseSeleccionada.fecha_hora).toLocaleDateString()}</p>
+                <p><strong>Hora:</strong> {new Date(claseSeleccionada.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                <p><strong>Estado:</strong> <span className={`_MC_estado-badge _MC_estado-${claseSeleccionada.estado.toLowerCase()}`}>{claseSeleccionada.estado}</span></p>
+            </div>
+            <div className="_MC_modal-actions">
+              <button className="_MC_btn-secondary" onClick={handleCerrarDetalles}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmationModal
+        show={confirmation.show}
+        title={confirmation.title}
+        message={confirmation.message}
+        onConfirm={confirmation.onConfirm}
+        onClose={() => setConfirmation({ ...confirmation, show: false })}
+        confirmText="Confirmar"
+        cancelText="Cancelar"
+      />
     </div>
   );
 };
