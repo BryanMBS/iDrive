@@ -32,7 +32,6 @@ CREATE TABLE Usuarios (
     telefono VARCHAR(20),
     cedula VARCHAR(20) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    salt VARCHAR(64) NOT NULL,
     id_rol INT NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ultimo_acceso TIMESTAMP NULL,
@@ -271,13 +270,13 @@ INSERT INTO Salones (nombre_salon, ubicacion, aforo, equipamiento) VALUES
 ('S101', 'Edificio Secundario - Piso 1', 25, 'Pizarra Interactiva');
 
 -- Usuarios (Contraseñas y salts son de ejemplo, deben ser generados de forma segura)
-INSERT INTO Usuarios (nombre, correo_electronico, telefono, cedula, password_hash, salt, id_rol) VALUES
-('Carlos Acosta', 'carlos.acosta@email.com', '3101112233', '1020304050', 'hash_ejemplo_1', 'salt_ejemplo_1', 1),
-('Lucia Méndez', 'lucia.mendez@email.com', '3114445566', '1030405060', 'hash_ejemplo_2', 'salt_ejemplo_2', 1),
-('Roberto Gómez', 'roberto.gomez@profes.com', '3127778899', '2010203040', 'hash_ejemplo_3', 'salt_ejemplo_3', 2),
-('Ana Jurado', 'ana.jurado@admin.com', '3130001122', '3040506070', 'hash_ejemplo_4', 'salt_ejemplo_4', 3),
-('Bryan Mora', 'bryanmora18@gmail.com', '3167303517', '1019096837', 'Daki2025*', 'salt_ejemplo_5', 3),
-('Administrador', 'administrador@idrive.com', '3001112222', '99999999', 'hash_ejemplo_admin1234', 'salt_ejemplo_6', 3);
+INSERT INTO Usuarios (nombre, correo_electronico, telefono, cedula, password_hash, id_rol) VALUES
+('Carlos Acosta', 'carlos.acosta@email.com', '3101112233', '1020304050', 'hash_ejemplo_1', 1),
+('Lucia Méndez', 'lucia.mendez@email.com', '3114445566', '1030405060', 'hash_ejemplo_2', 1),
+('Roberto Gómez', 'roberto.gomez@profes.com', '3127778899', '2010203040', 'hash_ejemplo_3', 2),
+('Ana Jurado', 'ana.jurado@admin.com', '3130001122', '3040506070', 'hash_ejemplo_4', 3),
+('Bryan Mora', 'bryanmora18@gmail.com', '3167303517', '1019096837', 'Daki2025*', 3),
+('Administrador', 'administrador@idrive.com', '3001112222', '99999999', 'hash_ejemplo_admin1234', 3);
 
 -- Poblar la tabla de Permisos con las acciones clave de la aplicación
 INSERT INTO `Permisos` (`nombre_permiso`, `descripcion`) VALUES
