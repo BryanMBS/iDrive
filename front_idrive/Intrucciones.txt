@@ -1,0 +1,9 @@
+En la carpeta front_idrive, se debe crear un archivo llamado .env y en el, se debe guardar la siguiente linea de codigo:
+
+REACT_APP_API_URL=http://127.0.0.1:8000
+
+Ya que funciona como enrutador de las paginas.
+
+Ejecutar npm install
+
+Inciar el front con npm start
