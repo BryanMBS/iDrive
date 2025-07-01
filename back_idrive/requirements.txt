@@ -5,8 +5,7 @@ fastapi
 uvicorn[standard]
 
 # --- Base de Datos (ORM y driver) ---
-SQLAlchemy
-PyMySQL         # Driver para conectar con MySQL
+mysql-connector-python #-- Para conectar a la base de datos
 
 # --- Seguridad (Contraseñas y JWT) ---
 passlib[bcrypt]

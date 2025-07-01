@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # --- Servicio del Backend (API con FastAPI) ---
+  backend:
+    build: ./back_idrive  # Directorio donde está el Dockerfile del backend
+    container_name: idrive_backend
+    ports:
+      - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 de tu máquina
+    environment:
+      # Variables de entorno que el backend usará para conectarse a la base de datos.
+      # El host es 'db', el nombre del servicio de MySQL en esta misma red.
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword  # Usa una contraseña más segura en producción
+      - DB_NAME=DataBaseiDrive
+    depends_on:
+      - db  # Le dice a Docker que inicie el servicio 'db' antes que el 'backend'
+
+  # --- Servicio del Frontend (Aplicación con React) ---
+  frontend:
+    build: ./front_idrive # Directorio donde está el Dockerfile del frontend
+    container_name: idrive_frontend
+    ports:
+      - "3000:3000" # Mapea el puerto 3000 del contenedor al puerto 3000 de tu máquina
+    environment:
+      # Variable de entorno para que React sepa dónde encontrar la API.
+      # Se usa localhost porque la llamada se hace desde el navegador del usuario.
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend # El frontend depende del backend
+
+  # --- Servicio de la Base de Datos (MySQL) ---
+  db:
+    image: mysql:8.4
+    build: ./database # Directorio donde está el Dockerfile de la base de datos
+    container_name: idrive_db
+    restart: always # Reinicia el contenedor si se detiene
+    environment:
+      # Credenciales para la base de datos. Deben coincidir con las del backend.
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: DataBaseiDrive
+    ports:
+      - "3307:3306" # Mapea el puerto 3306 del contenedor al 3307 de tu máquina para evitar conflictos
+    volumes:
+      # Crea un volumen persistente para que los datos de la BD no se pierdan
+      # si el contenedor se elimina o se reinicia.
+      - db-data:/var/lib/mysql
+
+# Define el volumen nombrado para la persistencia de datos de la base de datos
+volumes:
+  db-data:
