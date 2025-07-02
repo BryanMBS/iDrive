@@ -54,7 +54,7 @@ const Clases = () => {
     const [editando, setEditando] = useState(false);
     const [claseEditandoId, setClaseEditandoId] = useState(null);
     const [errorApi, setErrorApi] = useState(null);
-
+    // Declara un estado 'formulario' que es un objeto para manejar los valores de los campos del formulario.
     const [formulario, setFormulario] = useState({
         nombre_clase: "",
         descripcion: "",
@@ -73,7 +73,7 @@ const Clases = () => {
         confirmText: 'Confirmar',
         confirmVariant: 'btn-primary'
     });
-
+    // Función para obtener la lista de todas las clases del servidor.
     const fetchClases = useCallback(async () => {
         try {
             const response = await apiClient.get("/clases/");
@@ -84,7 +84,7 @@ const Clases = () => {
             setClases([]);
         }
     }, []);
-
+    // Función para obtener la lista de usuarios y filtrarlos para conseguir solo los profesores.
     const fetchProfesores = useCallback(async () => {
         try {
             const response = await apiClient.get("/usuarios/");
@@ -96,7 +96,7 @@ const Clases = () => {
             setProfesores([]);
         }
     }, []);
-
+    // Función para obtener la lista de todos los salones disponibles.
     const fetchSalones = useCallback(async () => {
         try {
             const response = await apiClient.get("/salones/");
@@ -107,6 +107,7 @@ const Clases = () => {
             setSalones([]);
         }
     }, []);
+    // El hook useEffect ejecuta código cuando el componente se monta por primera vez.
 
     useEffect(() => {
         fetchClases();
@@ -114,6 +115,7 @@ const Clases = () => {
         fetchSalones();
     }, [fetchClases, fetchProfesores, fetchSalones]);
 
+    // Función que se ejecuta al enviar el formulario para crear una nueva clase.
     const handleCrearClase = async () => {
         const datosParaEnviar = {
             ...formulario,

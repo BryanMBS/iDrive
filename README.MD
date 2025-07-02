@@ -17,6 +17,7 @@
 - [💻 Cómo Empezar](#como-empezar)
   - [⚙️ Requisitos Previos](#requisitos-previos)
   - [📦 Instalación](#instalacion)
+  - [🐳 Despliegue con Docker](#despliegue-con-docker)
   - [🚀 Uso](#uso)
   - [🧪 Pruebas](#pruebas)
   - [🚢 Despliegue](#despliegue)
@@ -31,15 +32,12 @@
 
 # 📖 Acerca del Proyecto <a name="acerca-del-proyecto"></a>
 
-**IDRIVE** iDrive es una aplicación web desarrollada para que las escuelas de conduccion y sus estudiantes puedan gestionar sus clases de manera eficiente. Utiliza FastAPI para el backend y React para el frontend, ofreciendo funcionalidades completas como:
+**IDRIVE** es una aplicación web desarrollada para que las escuelas de conducción y sus estudiantes puedan gestionar sus clases de manera eficiente. Utiliza FastAPI para el backend y React para el frontend, ofreciendo funcionalidades completas como:
 
-Creación, edición, eliminación y búsqueda de usuarios.
-
-Validación de datos y control de roles para garantizar una gestión segura.
-
-Cifrado de contraseñas para proteger la información de los usuarios.
-
-Creación y programación de clases teóricas, tanto para estudiantes como para administradores de academias.
+* Creación, edición, eliminación y búsqueda de usuarios.
+* Validación de datos y control de roles para garantizar una gestión segura.
+* Cifrado de contraseñas para proteger la información de los usuarios.
+* Creación y programación de clases teóricas, tanto para estudiantes como para administradores de academias.
 
 iDrive está diseñada para optimizar los procesos administrativos y mejorar la experiencia de estudiantes y personal de las escuelas de conducción.
 
@@ -76,7 +74,7 @@ iDrive está diseñada para optimizar los procesos administrativos y mejorar la 
 - 📅 Calendario interactivo con FullCalendar
 - 🌐 Comunicación API REST entre frontend y backend
 
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+<p align="right">[volver al inicio](#readme-top)</p>
 
 ---
 
@@ -84,7 +82,7 @@ iDrive está diseñada para optimizar los procesos administrativos y mejorar la 
 
 > Próximamente
 
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+<p align="right">[volver al inicio](#readme-top)</p>
 
 ---
 
@@ -92,10 +90,13 @@ iDrive está diseñada para optimizar los procesos administrativos y mejorar la 
 
 ### ⚙️ Requisitos Previos <a name="requisitos-previos"></a>
 
+Asegúrate de tener instalado lo siguiente:
+
 - Python 3.10+
 - Node.js
 - MySQL
 - Git
+- Docker y Docker Compose (para despliegue con contenedores)
 
 ---
 
@@ -116,83 +117,111 @@ uvicorn main:app --reload
 ```bash
 cd frontend
 npm install
-```
-
-Instalará automáticamente las siguientes dependencias clave:
-
-- `react`, `react-router-dom`, `react-scripts`
-- `axios`, `bootstrap`, `react-bootstrap`
-- `react-toastify`, `react-icons`, `@fortawesome/fontawesome-free`
-- `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`, 
-- `@python-jose[cryptography]`, `@passlib[bcrypt]`
-
-```bash
 npm start
 ```
 
+### 🐳 Despliegue con Docker
+
+También puedes levantar todo el entorno de desarrollo (backend, frontend y base de datos) usando Docker Compose. Este es el método recomendado.
+
+#### Clonar el repositorio
+
+```bash
+git clone https://github.com/BryanMBS/IDRIVE.git
+cd IDRIVE
+```
+
+#### Crear archivo de variables de entorno
+
+En la raíz del proyecto, crea un archivo llamado `.env`. Este archivo contendrá las credenciales y configuraciones para que los contenedores funcionen.
+
+```env
+# Credenciales para la Base de Datos
+DB_DATABASE=DataBaseiDrive
+DB_USER=root
+DB_PASSWORD=rootpassword
+DB_ROOT_PASSWORD=supersecretpassword
+
+# Puertos de la aplicación
+FRONTEND_PORT=3000
+BACKEND_PORT=8000
+DB_PORT=3307
+```
+
+#### Levantar los servicios
+
+```bash
+docker-compose up -d --build
+```
+
+Una vez finalizado, la aplicación estará disponible en:
+
+- Frontend: http://localhost:3000
+- Backend (API Docs): http://localhost:8000/docs
+
 ---
 
-### 🚀 Uso <a name="uso"></a>
+### 🚀 Uso
 
-1. Asegúrate de que tu base de datos esté activa.
-2. Inicia el backend con `uvicorn`.
-3. Abre otra terminal e inicia el frontend con `npm start`.
-
----
-
-### 🧪 Pruebas <a name="pruebas"></a>
-
-> Las pruebas automatizadas se implementarán en futuras versiones. Actualmente, puedes probar el funcionamiento de forma manual desde la interfaz web.
+- Asegúrate de que tu base de datos esté activa (si no usas Docker).
+- Inicia el backend con `uvicorn`.
+- Abre otra terminal e inicia el frontend con `npm start`.
 
 ---
 
-### 🚢 Despliegue <a name="despliegue"></a>
+### 🧪 Pruebas
 
-Este proyecto puede desplegarse en servicios como **Azure**, **Render**, o **Vercel** para el frontend.
-
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+Las pruebas automatizadas se implementarán en futuras versiones. Actualmente, puedes probar el funcionamiento de forma manual desde la interfaz web.
 
 ---
 
-## 👥 Autores <a name="autores"></a>
+### 🚢 Despliegue
 
-👤 **Bryan Mora**
+Este proyecto puede desplegarse en servicios como Azure, Render, o Vercel para el frontend, o utilizando Docker en cualquier proveedor de nube.
 
-- GitHub: [@BryanMBS](https://github.com/BryanMBS)
-
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+<p align="right">[volver al inicio](#readme-top)</p>
 
 ---
 
-## 🔭 Futuras Características <a name="futuras-caracteristicas"></a>
+## 👥 Autores
+
+👤 Bryan Mora
+
+GitHub: [@BryanMBS](https://github.com/BryanMBS)
+
+<p align="right">[volver al inicio](#readme-top)</p>
+
+---
+
+## 🔭 Futuras Características
 
 - [ ] Panel de administración con estadísticas
 - [ ] Soporte multilenguaje
 
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+<p align="right">[volver al inicio](#readme-top)</p>
 
 ---
 
-## 🤝 Contribuciones <a name="contribuciones"></a>
+## 🤝 Contribuciones
 
 ¡Las contribuciones, issues y solicitudes de mejoras son bienvenidas!
 
-Siente la libertad de revisar la [página de issues](https://github.com/BryanMBS/IDRIVE/issues).
+Siente la libertad de revisar la página de issues.
 
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+<p align="right">[volver al inicio](#readme-top)</p>
 
 ---
 
-## ⭐️ Apoya el Proyecto <a name="apoyo"></a>
+## ⭐️ Apoya el Proyecto
 
 Si te gusta este proyecto, dale una estrella ⭐ en GitHub para apoyar su desarrollo.
 
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+<p align="right">[volver al inicio](#readme-top)</p>
 
 ---
 
-## 📝 Licencia <a name="licencia"></a>
+## 📝 Licencia
 
-Este proyecto está licenciado bajo la licencia MIT. Consulta el archivo [LICENSE.md](https://github.com/BryanMBS/IDRIVE/LICENSE) para más información.
+Este proyecto está licenciado bajo la licencia MIT. Consulta el archivo LICENSE.md para más información.
 
-<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+<p align="right">[volver al inicio](#readme-top)</p>
